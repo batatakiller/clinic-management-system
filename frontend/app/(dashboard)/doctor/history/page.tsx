@@ -8,14 +8,15 @@ import { apiFetch } from "@/lib/api";
 interface Patient {
   _id: string;
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
 }
 
 interface Appointment {
   _id: string;
-  patientId: { _id: string; name: string };
+  patientId: { _id: string; name: string; email?: string };
   date: string;
+  timeSlot?: string;
   status: "pending" | "confirmed" | "in-progress" | "completed" | "cancelled" | "no_show";
   reason: string;
 }
@@ -57,7 +58,7 @@ export default function DoctorHistoryPage() {
       const patientId = appt.patientId?._id || "unknown";
       if (!acc[patientId]) {
         acc[patientId] = {
-          patient: appt.patientId || { _id: patientId, name: "Unknown" },
+          patient: appt.patientId || { _id: patientId, name: "Unknown", email: "" },
           appointments: [],
           lastVisit: "",
           totalVisits: 0,
