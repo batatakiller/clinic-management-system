@@ -1,0 +1,284 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─── Medical Theme Design Tokens ─────────────────────────────────── */
+@theme inline {
+  /* Core palette */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Typography */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+
+  /* Semantic colors */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Chart */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Radius scale */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* ─── Light Mode (Medical Theme) ──────────────────────────────────── */
+:root {
+  --radius: 0.5rem;
+
+  /* Surfaces */
+  --background: #ffffff;
+  --foreground: #0f172a;
+  /* slate-900 */
+
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  /* Primary — Medical Blue */
+  --primary: #2563eb;
+  /* blue-600 */
+  --primary-foreground: #ffffff;
+
+  /* Secondary — Light Blue-Gray */
+  --secondary: #eff6ff;
+  /* blue-50 */
+  --secondary-foreground: #1e40af;
+  /* blue-800 */
+
+  /* Muted */
+  --muted: #f1f5f9;
+  /* slate-100 */
+  --muted-foreground: #64748b;
+  /* slate-500 */
+
+  /* Accent — Teal */
+  --accent: #f0fdfa;
+  /* teal-50 */
+  --accent-foreground: #0d9488;
+  /* teal-600 */
+
+  /* Destructive */
+  --destructive: #ef4444;
+  /* red-500 */
+
+  /* Borders & Inputs */
+  --border: #e2e8f0;
+  /* slate-200 */
+  --input: #e2e8f0;
+  --ring: #93c5fd;
+  /* blue-300 */
+
+  /* Charts */
+  --chart-1: #2563eb;
+  --chart-2: #0d9488;
+  --chart-3: #7c3aed;
+  --chart-4: #f59e0b;
+  --chart-5: #ef4444;
+
+  /* Sidebar — faint blue-tinted white */
+  --sidebar: #f8faff;
+  --sidebar-foreground: #1e293b;
+  /* slate-800 */
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eff6ff;
+  /* blue-50 */
+  --sidebar-accent-foreground: #1e40af;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #93c5fd;
+
+  /* Custom medical utilities */
+  --med-success: #10b981;
+  /* emerald-500 */
+  --med-warning: #f59e0b;
+  /* amber-500 */
+  --med-info: #0ea5e9;
+  /* sky-500 */
+}
+
+/* ─── Dark Mode ── (kept minimal, not the primary theme) ─────────── */
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+
+  --secondary: #1e3a5f;
+  --secondary-foreground: #bfdbfe;
+
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+
+  --accent: #134e4a;
+  --accent-foreground: #5eead4;
+
+  --destructive: #f87171;
+
+  --border: #334155;
+  --input: #334155;
+  --ring: #3b82f6;
+
+  --chart-1: #3b82f6;
+  --chart-2: #14b8a6;
+  --chart-3: #a78bfa;
+  --chart-4: #fbbf24;
+  --chart-5: #f87171;
+
+  --sidebar: #1a2540;
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e3a5f;
+  --sidebar-accent-foreground: #bfdbfe;
+  --sidebar-border: #334155;
+  --sidebar-ring: #3b82f6;
+}
+
+/* ─── Base Layer ──────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-inter), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbar — thin, medical blue */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+  }
+
+  /* Focus ring */
+  :focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+}
+
+/* ─── Utility Classes ─────────────────────────────────────────────── */
+@layer utilities {
+
+  /* Role badge colors */
+  .role-admin {
+    @apply bg-violet-50 text-violet-700;
+  }
+
+  .role-doctor {
+    @apply bg-blue-50 text-blue-700;
+  }
+
+  .role-receptionist {
+    @apply bg-teal-50 text-teal-700;
+  }
+
+  .role-patient {
+    @apply bg-emerald-50 text-emerald-700;
+  }
+
+  /* Card with subtle shadow — now rounds to 2xl */
+  .med-card {
+    @apply bg-white rounded-2xl border border-slate-200/80 shadow-sm;
+  }
+
+  /* Smooth transitions */
+  .transition-med {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Glassmorphism panel */
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-md border border-white/30 shadow-xl;
+  }
+
+  /* Sidebar item */
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 cursor-pointer select-none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar-item:hover {
+    @apply bg-slate-100 text-slate-900;
+  }
+
+  .sidebar-item.active {
+    @apply bg-blue-600 text-white shadow-md;
+  }
+
+  /* Stat card hover uplift */
+  .stat-card {
+    @apply bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm;
+    @apply hover:shadow-lg hover:-translate-y-0.5;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Badge premium */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border;
+  }
+}
