@@ -46,7 +46,7 @@ export default function ReceptionistQueuePage() {
 
   useEffect(() => {
     fetchAppointments();
-    
+
     // Auto-refresh every 30 seconds
     const interval = setInterval(fetchAppointments, 30000);
     return () => clearInterval(interval);
@@ -133,11 +133,10 @@ export default function ReceptionistQueuePage() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-med ${
-              filter === f
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-med ${filter === f
                 ? "bg-primary text-white"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
+              }`}
           >
             {f === "all" ? "All" : f.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())}
           </button>
@@ -176,7 +175,7 @@ export default function ReceptionistQueuePage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-sm font-medium text-foreground">{appt.timeSlot || appt.time || "TBD"}</p>
+                    <p className="text-sm font-medium text-foreground">{appt.timeSlot || "TBD"}</p>
                     <span
                       className={`text-xs font-medium px-2 py-0.5 rounded-full border ${STATUS_COLORS[appt.status]}`}
                     >
