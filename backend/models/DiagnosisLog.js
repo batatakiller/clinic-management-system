@@ -29,7 +29,7 @@ const diagnosisLogSchema = new mongoose.Schema(
             condition: { type: String, default: null },
             riskLevel: {
                 type: String,
-                enum: ['low', 'medium', 'high', 'critical', null],
+                enum: ['low', 'medium', 'high', 'critical'],
                 default: null,
             },
             recommendations: { type: String, default: null },

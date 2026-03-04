@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const PatientProfile = require('../models/PatientProfile');
 const { generateToken } = require('../utils/generateToken');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 
@@ -9,7 +10,7 @@ const { successResponse, errorResponse } = require('../utils/apiResponse');
 // ─────────────────────────────────────────────────
 const register = async (req, res, next) => {
     try {
-        const { name, email, password, role, phone, specialization, licenseNumber } = req.body;
+        const { name, email, password, role, phone } = req.body;
 
         // Prevent public registration of admin/doctor — those must be created by admin
         const allowedPublicRoles = ['patient', 'receptionist'];
@@ -27,8 +28,14 @@ const register = async (req, res, next) => {
             password,
             role: assignedRole,
             phone,
-            ...(assignedRole === 'doctor' && { specialization, licenseNumber }),
         });
+
+        // If user is a patient, create an empty patient profile
+        if (assignedRole === 'patient') {
+            await PatientProfile.create({
+                userId: user._id,
+            });
+        }
 
         const token = generateToken(user._id, user.role);
 
@@ -156,4 +163,65 @@ const changePassword = async (req, res, next) => {
     }
 };
 
-module.exports = { register, login, getMe, changePassword };
+const cloudinary = require('../config/cloudinary');
+
+// @route   PUT /api/auth/profile
+// @access  Private
+// @desc    Update currently logged in user's basic profile
+const updateProfile = async (req, res, next) => {
+    try {
+        const { name, phone } = req.body;
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return errorResponse(res, 'User not found.', 404);
+        }
+
+        if (name) user.name = name;
+        if (phone) user.phone = phone;
+
+        // Handle profile image upload if provided
+        if (req.file) {
+            try {
+                // Upload to Cloudinary using buffer
+                const uploadResult = await new Promise((resolve, reject) => {
+                    cloudinary.uploader.upload_stream(
+                        {
+                            folder: 'healthcare/profiles',
+                            public_id: `profile_${user._id}`,
+                            overwrite: true,
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    ).end(req.file.buffer);
+                });
+
+                user.profileImage = uploadResult.secure_url;
+            } catch (uploadError) {
+                console.error('Cloudinary upload error:', uploadError);
+                // Continue without updating image if upload fails
+            }
+        }
+
+        await user.save();
+
+        return successResponse(
+            res,
+            {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                phone: user.phone,
+                profileImage: user.profileImage,
+            },
+            'Profile updated successfully'
+        );
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { register, login, getMe, changePassword, updateProfile };

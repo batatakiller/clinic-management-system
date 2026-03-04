@@ -131,6 +131,55 @@ const createStaff = async (req, res, next) => {
     }
 };
 
+// @route   GET /api/users/:id
+// @access  Admin, Doctor, Receptionist
+const getUserById = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return errorResponse(res, 'User not found.', 404);
+        return successResponse(res, user, 'User retrieved successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @route   PUT /api/users/staff/:id
+// @access  Admin
+const updateStaff = async (req, res, next) => {
+    try {
+        const { name, phone, isActive } = req.body;
+
+        const staff = await User.findOne({ _id: req.params.id, role: 'receptionist' });
+        if (!staff) return errorResponse(res, 'Staff member not found.', 404);
+
+        if (name) staff.name = name;
+        if (phone) staff.phone = phone;
+        if (isActive !== undefined) staff.isActive = isActive;
+
+        await staff.save();
+        return successResponse(res, staff, 'Staff member updated successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @route   DELETE /api/users/staff/:id
+// @access  Admin
+const deleteStaff = async (req, res, next) => {
+    try {
+        const staff = await User.findOne({ _id: req.params.id, role: 'receptionist' });
+        if (!staff) return errorResponse(res, 'Staff member not found.', 404);
+
+        // Soft delete
+        staff.isActive = false;
+        await staff.save();
+
+        return successResponse(res, null, 'Staff member deactivated successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @route   GET /api/users/stats
 // @access  Admin
 const getDashboardStats = async (req, res, next) => {
@@ -153,6 +202,58 @@ const getDashboardStats = async (req, res, next) => {
     }
 };
 
+// ─────────────────────────────────────────────────
+// GENERIC USER MANAGEMENT (Admin only)
+// ─────────────────────────────────────────────────
+
+// @route   PUT /api/users/:id
+// @access  Admin
+const updateUser = async (req, res, next) => {
+    try {
+        const { name, email, phone, isActive } = req.body;
+
+        const user = await User.findById(req.params.id);
+        if (!user) return errorResponse(res, 'User not found.', 404);
+
+        // Prevent changing role through this endpoint
+        if (['doctor', 'receptionist'].includes(user.role)) {
+            return errorResponse(res, 'Use specific endpoint for this user type.', 400);
+        }
+
+        if (name) user.name = name;
+        if (email) user.email = email;
+        if (phone) user.phone = phone;
+        if (isActive !== undefined) user.isActive = isActive;
+
+        await user.save();
+        return successResponse(res, user, 'User updated successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @route   DELETE /api/users/:id
+// @access  Admin
+const deleteUser = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return errorResponse(res, 'User not found.', 404);
+
+        // Prevent deleting doctors/staff through this endpoint
+        if (['doctor', 'receptionist'].includes(user.role)) {
+            return errorResponse(res, 'Use specific endpoint for this user type.', 400);
+        }
+
+        // Soft delete
+        user.isActive = false;
+        await user.save();
+
+        return successResponse(res, null, 'User deactivated successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllDoctors,
     createDoctor,
@@ -160,5 +261,10 @@ module.exports = {
     deleteDoctor,
     getAllStaff,
     createStaff,
+    getUserById,
+    updateStaff,
+    deleteStaff,
     getDashboardStats,
+    updateUser,
+    deleteUser,
 };

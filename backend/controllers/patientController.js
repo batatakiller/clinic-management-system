@@ -12,12 +12,29 @@ const getAllPatients = async (req, res, next) => {
         const { search, bloodGroup, page = 1, limit = 20 } = req.query;
         const filter = { role: 'patient', isActive: true };
 
+        // Handle bloodGroup filter first (since it's in PatientProfile)
+        if (bloodGroup) {
+            const profilesWithBloodGroup = await PatientProfile.find({ bloodGroup }).select('userId');
+            const userIdsWithBloodGroup = profilesWithBloodGroup.map(p => p.userId);
+            filter._id = { $in: userIdsWithBloodGroup };
+        }
+
         if (search) {
-            filter.$or = [
-                { name: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
-                { phone: { $regex: search, $options: 'i' } },
-            ];
+            const searchFilter = {
+                $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { phone: { $regex: search, $options: 'i' } },
+                ]
+            };
+            
+            // If we already have a bloodGroup filter (_id: { $in: ... }), we must use $and
+            if (filter._id) {
+                filter.$and = [ { _id: filter._id }, searchFilter ];
+                delete filter._id;
+            } else {
+                Object.assign(filter, searchFilter);
+            }
         }
 
         const skip = (Number(page) - 1) * Number(limit);
@@ -49,10 +66,15 @@ const getAllPatients = async (req, res, next) => {
 
 // ─────────────────────────────────────────────────
 // @route   GET /api/patients/:id
-// @access  Admin, Receptionist, Doctor
+// @access  Admin, Receptionist, Doctor, Patient (own only)
 // ─────────────────────────────────────────────────
 const getPatientById = async (req, res, next) => {
     try {
+        // Security check: Patients can only see their own profile
+        if (req.user.role === 'patient' && req.user._id.toString() !== req.params.id) {
+            return errorResponse(res, 'You are not authorized to view this patient profile.', 403);
+        }
+
         const patient = await User.findOne({ _id: req.params.id, role: 'patient' });
         if (!patient) return errorResponse(res, 'Patient not found.', 404);
 
