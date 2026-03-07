@@ -47,14 +47,16 @@ export default function PatientHistoryPage() {
         }
 
         const [rxData, apptData] = await Promise.all([
-          apiFetch(`/api/prescriptions/patient/${user._id}`).catch(() => ({ data: [] })),
+          apiFetch(`/api/prescriptions/patient/${user._id}`).catch(() => ({
+            data: [],
+          })),
           apiFetch(`/api/appointments`).catch(() => ({ data: [] })),
         ]);
 
         // Filter appointments for this patient
         const patientAppointments = (apptData.data || []).filter(
-          (a: Appointment & { patient?: { _id: string } }) => 
-            a.patient?._id === user._id
+          (a: Appointment & { patient?: { _id: string } }) =>
+            a.patient?._id === user._id,
         );
 
         setPrescriptions(rxData.data || []);
@@ -71,11 +73,37 @@ export default function PatientHistoryPage() {
 
   const downloadPDF = async (rx: Prescription) => {
     try {
-      const response = await fetch(`/api/prescriptions/${rx._id}/pdf`, {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("hms-token")}`,
+      setLoading(true);
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const token = (() => {
+        if (typeof localStorage !== "undefined") {
+          try {
+            const stored = localStorage.getItem("hms_auth");
+            if (stored) {
+              const parsed = JSON.parse(stored);
+              return parsed.token || null;
+            }
+          } catch {
+            // ignore parse errors
+          }
+        }
+        return null;
+      })();
+
+      const response = await fetch(
+        `${baseUrl}/api/prescriptions/${rx._id}/pdf`,
+        {
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
         },
-      });
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to download PDF: ${response.status}`);
+      }
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -84,7 +112,11 @@ export default function PatientHistoryPage() {
       a.click();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Download failed:", err);
+      const errorMsg =
+        err instanceof Error ? err.message : "Failed to download PDF";
+      setError(errorMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,7 +126,9 @@ export default function PatientHistoryPage() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">Loading your medical history...</p>
+            <p className="text-muted-foreground">
+              Loading your medical history...
+            </p>
           </div>
         </div>
       </DashboardLayout>
@@ -104,8 +138,12 @@ export default function PatientHistoryPage() {
   return (
     <DashboardLayout requiredRole="patient">
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-foreground">My Medical History</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">View your complete medical records</p>
+        <h1 className="text-xl font-bold text-foreground">
+          My Medical History
+        </h1>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          View your complete medical records
+        </p>
       </div>
 
       {error && (
@@ -122,7 +160,9 @@ export default function PatientHistoryPage() {
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{prescriptions.length}</p>
+              <p className="text-2xl font-bold text-foreground">
+                {prescriptions.length}
+              </p>
               <p className="text-xs text-muted-foreground">Prescriptions</p>
             </div>
           </div>
@@ -133,7 +173,9 @@ export default function PatientHistoryPage() {
               <Calendar className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{appointments.length}</p>
+              <p className="text-2xl font-bold text-foreground">
+                {appointments.length}
+              </p>
               <p className="text-xs text-muted-foreground">Appointments</p>
             </div>
           </div>
@@ -155,7 +197,9 @@ export default function PatientHistoryPage() {
                       <FileText className="w-4 h-4 text-purple-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-foreground">{rx.diagnosis}</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {rx.diagnosis}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(rx.createdAt).toLocaleDateString()}
                       </p>
@@ -171,13 +215,18 @@ export default function PatientHistoryPage() {
                 </div>
                 <div className="space-y-1">
                   {rx.medicines.slice(0, 3).map((med, i) => (
-                    <div key={i} className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <div
+                      key={i}
+                      className="text-xs text-muted-foreground flex items-center gap-1.5"
+                    >
                       <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
                       {med.name} {med.dosage}
                     </div>
                   ))}
                   {rx.medicines.length > 3 && (
-                    <p className="text-xs text-muted-foreground">+{rx.medicines.length - 3} more medicines</p>
+                    <p className="text-xs text-muted-foreground">
+                      +{rx.medicines.length - 3} more medicines
+                    </p>
                   )}
                 </div>
               </div>
@@ -200,12 +249,17 @@ export default function PatientHistoryPage() {
           <div className="med-card overflow-hidden">
             <div className="divide-y divide-border">
               {appointments.slice(0, 10).map((appt) => (
-                <div key={appt._id} className="flex items-center gap-4 p-4 hover:bg-muted/40 transition-med">
+                <div
+                  key={appt._id}
+                  className="flex items-center gap-4 p-4 hover:bg-muted/40 transition-med"
+                >
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium text-sm">
                     <User className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">{appt.reason}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {appt.reason}
+                    </p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
@@ -224,8 +278,8 @@ export default function PatientHistoryPage() {
                       appt.status === "completed"
                         ? "bg-emerald-100 text-emerald-700"
                         : appt.status === "cancelled"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-blue-100 text-blue-700"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-blue-100 text-blue-700"
                     }`}
                   >
                     {appt.status}
