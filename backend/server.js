@@ -17,6 +17,7 @@ const prescriptionRoutes = require("./routes/prescriptionRoutes");
 const diagnosisRoutes = require("./routes/diagnosisRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
+const scheduleRoutes = require("./routes/scheduleRoutes");
 
 const app = express();
 
@@ -34,7 +35,11 @@ app.use("/api/", limiter);
 app.use(compression());
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL || "http://localhost:3000", "http://localhost:3000", "http://localhost:3001"],
+    origin: [
+      process.env.CLIENT_URL || "http://localhost:3000",
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ],
     credentials: true,
   }),
 );
@@ -46,6 +51,20 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
+
+// ── Cache Control Middleware ───────────────────────────────────────────
+// Prevent caching of API responses to ensure fresh data
+app.use((req, res, next) => {
+  // For API endpoints, set no-cache headers
+  if (req.path.startsWith("/api/")) {
+    res.set({
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
+    });
+  }
+  next();
+});
 
 // ── Health Check ───────────────────────────────────────────────────────
 app.get("/api/health", (req, res) => {
@@ -75,6 +94,7 @@ app.use("/api/prescriptions", prescriptionRoutes);
 app.use("/api/diagnosis", diagnosisRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/schedules", scheduleRoutes);
 
 // ── 404 Handler (unknown routes) ───────────────────────────────────────
 app.use((req, res) => {

@@ -66,9 +66,17 @@ exports.sendMessage = async (req, res) => {
       // Return helpful fallback response
       let fallbackText = FALLBACK_RESPONSES.default;
       const lowerMsg = message.toLowerCase();
-      if (lowerMsg.includes('symptom') || lowerMsg.includes('pain') || lowerMsg.includes('fever')) {
+      if (
+        lowerMsg.includes("symptom") ||
+        lowerMsg.includes("pain") ||
+        lowerMsg.includes("fever")
+      ) {
         fallbackText = FALLBACK_RESPONSES.symptoms;
-      } else if (lowerMsg.includes('medication') || lowerMsg.includes('drug') || lowerMsg.includes('pill')) {
+      } else if (
+        lowerMsg.includes("medication") ||
+        lowerMsg.includes("drug") ||
+        lowerMsg.includes("pill")
+      ) {
         fallbackText = FALLBACK_RESPONSES.medication;
       }
 
@@ -144,20 +152,32 @@ exports.sendMessage = async (req, res) => {
     console.error("Chatbot Error:", error.response?.data || error.message);
 
     // Check for OpenRouter data policy error (404) or any AI service error
-    const errorMsg = error.response?.data?.error?.message || error.message || "";
-    const isDataPolicyError = errorMsg.includes('data policy') || errorMsg.includes('No endpoints found');
-    const isServiceUnavailable = error.response?.status === 404 || error.response?.status === 503;
+    const errorMsg =
+      error.response?.data?.error?.message || error.message || "";
+    const isDataPolicyError =
+      errorMsg.includes("data policy") ||
+      errorMsg.includes("No endpoints found");
+    const isServiceUnavailable =
+      error.response?.status === 404 || error.response?.status === 503;
 
     if (isDataPolicyError || isServiceUnavailable || !apiKey) {
       let fallbackText = FALLBACK_RESPONSES.default;
       const lowerMsg = (req.body.message || "").toLowerCase();
-      if (lowerMsg.includes('symptom') || lowerMsg.includes('pain') || lowerMsg.includes('fever')) {
+      if (
+        lowerMsg.includes("symptom") ||
+        lowerMsg.includes("pain") ||
+        lowerMsg.includes("fever")
+      ) {
         fallbackText = FALLBACK_RESPONSES.symptoms;
-      } else if (lowerMsg.includes('medication') || lowerMsg.includes('drug') || lowerMsg.includes('pill')) {
+      } else if (
+        lowerMsg.includes("medication") ||
+        lowerMsg.includes("drug") ||
+        lowerMsg.includes("pill")
+      ) {
         fallbackText = FALLBACK_RESPONSES.medication;
       }
 
-      return res.status(200).json({
+      return res.status(503).json({
         success: true,
         message: "AI service unavailable - using fallback response",
         data: {
@@ -200,7 +220,8 @@ exports.healthCheck = async (req, res) => {
     if (!apiKey) {
       return res.status(200).json({
         success: true,
-        message: "Chatbot service running (AI key not configured - using fallback)",
+        message:
+          "Chatbot service running (AI key not configured - using fallback)",
         model: "fallback",
       });
     }

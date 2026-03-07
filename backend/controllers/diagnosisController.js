@@ -61,6 +61,14 @@ const getAIDiagnosis = async (req, res, next) => {
       );
     }
 
+    // Validate symptoms are non-empty strings
+    const validSymptoms = symptoms.filter(
+      (s) => typeof s === "string" && s.trim().length > 0,
+    );
+    if (validSymptoms.length === 0) {
+      return errorResponse(res, "All symptoms must be non-empty strings.", 400);
+    }
+
     if (!patientId) {
       return errorResponse(res, "patientId is required.", 400);
     }
