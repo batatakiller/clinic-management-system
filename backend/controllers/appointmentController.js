@@ -272,10 +272,71 @@ const cancelAppointment = async (req, res, next) => {
   }
 };
 
+// ─────────────────────────────────────────────────
+// @route   PUT /api/appointments/:id
+// @access  Admin, Receptionist
+// @desc    Update appointment details
+// ─────────────────────────────────────────────────
+const updateAppointment = async (req, res, next) => {
+  try {
+    const { patientId, doctorId, date, timeSlot, reason, status, notes } = req.body;
+
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment) return errorResponse(res, "Appointment not found.", 404);
+
+    if (patientId) {
+      const patient = await User.findOne({ _id: patientId, role: "patient" });
+      if (!patient) return errorResponse(res, "Patient not found.", 404);
+      appointment.patientId = patientId;
+    }
+
+    if (doctorId) {
+      const doctor = await User.findOne({ _id: doctorId, role: "doctor", isActive: true });
+      if (!doctor) return errorResponse(res, "Doctor not found or inactive.", 404);
+      appointment.doctorId = doctorId;
+    }
+
+    if (date) appointment.date = new Date(date);
+    if (timeSlot) appointment.timeSlot = timeSlot;
+    if (reason) appointment.reason = reason;
+    if (status) appointment.status = status;
+    if (notes !== undefined) appointment.notes = notes;
+
+    await appointment.save();
+
+    const populated = await appointment.populate([
+      { path: "patientId", select: "name email phone" },
+      { path: "doctorId", select: "name specialization phone" },
+    ]);
+
+    return successResponse(res, populated, "Appointment updated successfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────
+// @route   DELETE /api/appointments/:id
+// @access  Admin
+// @desc    Delete appointment
+// ─────────────────────────────────────────────────
+const deleteAppointment = async (req, res, next) => {
+  try {
+    const appointment = await Appointment.findByIdAndDelete(req.params.id);
+    if (!appointment) return errorResponse(res, "Appointment not found.", 404);
+    return successResponse(res, null, "Appointment deleted successfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   bookAppointment,
   getAppointments,
   getAppointmentById,
   updateAppointmentStatus,
   cancelAppointment,
+  updateAppointment,
+  deleteAppointment,
 };
+

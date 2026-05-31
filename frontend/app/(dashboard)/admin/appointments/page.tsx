@@ -96,9 +96,40 @@ const TYPE_LABELS: Record<string, string> = {
   other: "Outro",
 };
 
+const REVERSE_TYPE_LABELS: Record<string, Appointment["type"]> = {
+  "Check-up": "checkup",
+  "Retorno": "follow-up",
+  "Emergência": "emergency",
+  "Consulta": "consultation",
+  "Outro": "other",
+  "checkup": "checkup",
+  "follow-up": "follow-up",
+  "emergency": "emergency",
+  "consultation": "consultation",
+  "other": "other",
+};
+
+const mapTypeFromReason = (reason?: string): Appointment["type"] => {
+  if (!reason) return "checkup";
+  return REVERSE_TYPE_LABELS[reason] || "other";
+};
+
+const mapStatusFromDb = (dbStatus: string): Appointment["status"] => {
+  if (dbStatus === "pending") return "scheduled";
+  if (dbStatus === "no_show") return "no-show";
+  return dbStatus as Appointment["status"];
+};
+
+const mapStatusToDb = (feStatus: string): string => {
+  if (feStatus === "scheduled") return "pending";
+  if (feStatus === "no-show") return "no_show";
+  return feStatus;
+};
+
 export default function ManageAppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
@@ -124,12 +155,24 @@ export default function ManageAppointmentsPage() {
 
   const fetchData = async () => {
     try {
-      const [appointmentsRes, doctorsRes] = await Promise.all([
+      const [appointmentsRes, doctorsRes, patientsRes] = await Promise.all([
         apiFetch("/api/appointments").catch(() => ({ data: [] })),
         apiFetch("/api/users/doctors").catch(() => ({ data: [] })),
+        apiFetch("/api/patients?limit=100").catch(() => ({ data: [] })),
       ]);
-      setAppointments(appointmentsRes.data || []);
+
+      const mappedAppointments = (appointmentsRes.data || []).map((apt: any) => ({
+        ...apt,
+        patient: apt.patientId,
+        doctor: apt.doctorId,
+        time: apt.timeSlot || "",
+        status: mapStatusFromDb(apt.status),
+        type: mapTypeFromReason(apt.reason),
+      }));
+
+      setAppointments(mappedAppointments);
       setDoctors(doctorsRes.data || []);
+      setPatients(patientsRes.data || []);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
@@ -139,9 +182,9 @@ export default function ManageAppointmentsPage() {
 
   const filteredAppointments = appointments.filter((apt) => {
     const matchesSearch =
-      apt.patient?.name.toLowerCase().includes(search.toLowerCase()) ||
-      apt.doctor?.name.toLowerCase().includes(search.toLowerCase()) ||
-      apt.doctor?.specialization.toLowerCase().includes(search.toLowerCase());
+      apt.patient?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      apt.doctor?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      apt.doctor?.specialization?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus =
       statusFilter === "all" || apt.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -153,7 +196,7 @@ export default function ManageAppointmentsPage() {
       setFormData({
         patientId: appointment.patient?._id || "",
         doctorId: appointment.doctor?._id || "",
-        date: appointment.date.split("T")[0],
+        date: appointment.date ? appointment.date.split("T")[0] : "",
         time: appointment.time,
         status: appointment.status,
         type: appointment.type,
@@ -186,9 +229,9 @@ export default function ManageAppointmentsPage() {
         patientId: formData.patientId,
         doctorId: formData.doctorId,
         date: formData.date,
-        time: formData.time,
-        status: formData.status,
-        type: formData.type,
+        timeSlot: formData.time,
+        status: mapStatusToDb(formData.status),
+        reason: TYPE_LABELS[formData.type] || formData.type,
         notes: formData.notes,
       };
 
@@ -225,9 +268,9 @@ export default function ManageAppointmentsPage() {
 
   const handleStatusChange = async (id: string, newStatus: Appointment["status"]) => {
     try {
-      await apiFetch(`/api/appointments/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ status: newStatus }),
+      await apiFetch(`/api/appointments/${id}/status`, {
+        method: "PUT",
+        body: JSON.stringify({ status: mapStatusToDb(newStatus) }),
       });
       fetchData();
     } catch (error) {
@@ -470,7 +513,11 @@ export default function ManageAppointmentsPage() {
                   required
                 >
                   <option value="">Selecionar Paciente</option>
-                  <option value="placeholder">Paciente (integrado com a lista de pacientes)</option>
+                  {patients.map((p) => (
+                    <option key={p._id} value={p._id}>
+                      {p.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 

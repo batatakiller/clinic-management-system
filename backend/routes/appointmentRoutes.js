@@ -7,6 +7,8 @@ const {
   getAppointmentById,
   updateAppointmentStatus,
   cancelAppointment,
+  updateAppointment,
+  deleteAppointment,
 } = require("../controllers/appointmentController");
 const { verifyToken } = require("../middlewares/auth");
 const { checkRole } = require("../middlewares/checkRole");
@@ -51,6 +53,28 @@ router.put(
   "/:id/cancel",
   checkRole("admin", "receptionist", "patient"),
   cancelAppointment,
+);
+
+// Update appointment details: Admin, Receptionist
+router.put(
+  "/:id",
+  checkRole("admin", "receptionist"),
+  [
+    body("patientId", "Patient ID must be a valid Mongo ID").optional().isMongoId(),
+    body("doctorId", "Doctor ID must be a valid Mongo ID").optional().isMongoId(),
+    body("date", "Appointment date must be a valid ISO8601 date").optional().isISO8601(),
+    body("timeSlot", "Time slot cannot be empty").optional().notEmpty().trim(),
+    body("reason", "Reason cannot be empty").optional().notEmpty().trim(),
+  ],
+  validate,
+  updateAppointment
+);
+
+// Delete appointment: Admin only
+router.delete(
+  "/:id",
+  checkRole("admin"),
+  deleteAppointment
 );
 
 // All authenticated roles can view appointments (controller enforces role-based filtering)
