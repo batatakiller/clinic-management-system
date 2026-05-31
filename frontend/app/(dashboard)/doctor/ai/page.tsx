@@ -47,7 +47,7 @@ const SAMPLE_SYMPTOMS = [
 
 export default function SymptomCheckerPage() {
   const [symptoms, setSymptoms] = useState("");
-  const [language, setLanguage] = useState("English");
+  const [language, setLanguage] = useState("Portuguese");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AIResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -229,16 +229,12 @@ export default function SymptomCheckerPage() {
                 Idioma de Resposta
               </label>
               <div className="flex gap-2">
-                {["English", "Urdu"].map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    onClick={() => setLanguage(l)}
-                    className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-med ${language === l ? "bg-primary text-white border-primary" : "border-border hover:bg-muted text-foreground"}`}
-                  >
-                    {l === "Urdu" ? "اردو" : l}
-                  </button>
-                ))}
+                <button
+                  type="button"
+                  className="flex-1 py-2 rounded-lg text-sm font-semibold border bg-primary text-white border-primary cursor-default"
+                >
+                  Português (BR)
+                </button>
               </div>
             </div>
 
