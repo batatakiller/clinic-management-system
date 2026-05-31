@@ -60,13 +60,11 @@ interface AppointmentData {
 }
 interface ApiResponse<T> { data: T[]; }
 
-
-
 const QUICK_ACTIONS = [
-  { label: "Register Patient", href: "/admin/users", icon: UserPlus },
-  { label: "Onboard Staff", href: "/admin/users", icon: Users },
-  { label: "System Reports", href: "#", icon: FileText },
-  { label: "Performance Analytics", href: "#", icon: BarChart3 },
+  { label: "Cadastrar Paciente", href: "/admin/users", icon: UserPlus },
+  { label: "Admitir Funcionário", href: "/admin/users", icon: Users },
+  { label: "Relatórios do Sistema", href: "#", icon: FileText },
+  { label: "Análise de Desempenho", href: "#", icon: BarChart3 },
 ];
 
 const TYPE_ICON: Record<string, React.ElementType> = {
@@ -86,8 +84,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center justify-between gap-4 py-0.5">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full" style={{ background: p.color }} />
-            <span className="text-slate-500 capitalize">{p.dataKey}</span>
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: p.color }} />
+            <span className="text-slate-500">{p.dataKey === "appointments" ? "Consultas" : p.dataKey}</span>
           </div>
           <span className="font-medium text-slate-900">{p.value}</span>
         </div>
@@ -119,7 +117,7 @@ function StatCard({ stat }: { stat: StatItem }) {
           <TrendIcon className="w-4 h-4" />
           {stat.change}
         </span>
-        <span className="text-slate-400">vs last period</span>
+        <span className="text-slate-400">vs período anterior</span>
       </div>
     </div>
   );
@@ -151,28 +149,28 @@ export default function AdminDashboard() {
 
         setStats([
           {
-            label: "Total Patients",
+            label: "Total de Pacientes",
             value: totalPatients.toLocaleString(),
             change: "+12.5%",
             trend: "up",
             icon: Users,
           },
           {
-            label: "Active Staff",
+            label: "Funcionários Ativos",
             value: activeDoctors.toLocaleString(),
             change: "+2.4%",
             trend: "up",
             icon: Stethoscope,
           },
           {
-            label: "Appointments Today",
+            label: "Consultas Hoje",
             value: todayAppts.toLocaleString(),
             change: "-4.1%",
             trend: "down",
             icon: Calendar,
           },
           {
-            label: "System Uptime",
+            label: "Uptime do Sistema",
             value: "99.9%",
             change: "0.0%",
             trend: "neutral",
@@ -180,17 +178,28 @@ export default function AdminDashboard() {
           },
         ]);
 
+        const statusMap: Record<string, string> = {
+          pending: "pendente",
+          completed: "concluída",
+          cancelled: "cancelada",
+          confirmed: "confirmada",
+        };
+
         const activities: ActivityItem[] = (appointmentsRes.data || [])
           .slice(0, 5)
-          .map((a) => ({
-            text: `Appointment for ${a.patient?.name || "Unknown Patient"} was marked as ${a.status}`,
-            time: a.createdAt ? new Date(a.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Recently",
-            type: (a.status === "cancelled" ? "warning" : a.status === "completed" ? "success" : "info") as ActivityItem["type"],
-          }));
+          .map((a) => {
+            const translatedStatus = statusMap[a.status] || a.status;
+            const patientName = a.patient?.name || "Paciente Desconhecido";
+            return {
+              text: `Consulta de ${patientName} foi marcada como ${translatedStatus}`,
+              time: a.createdAt ? new Date(a.createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "Recentemente",
+              type: (a.status === "cancelled" ? "warning" : a.status === "completed" ? "success" : "info") as ActivityItem["type"],
+            };
+          });
 
         if (activities.length === 0) {
-          activities.push({ text: "System initialized and checks passed.", time: "Just now", type: "success" });
-          activities.push({ text: "Database synchronized with replica.", time: "1 hr ago", type: "info" });
+          activities.push({ text: "Sistema inicializado e verificações aprovadas.", time: "Agora mesmo", type: "success" });
+          activities.push({ text: "Banco de dados sincronizado com a réplica.", time: "Há 1 hora", type: "info" });
         }
         setRecentActivity(activities);
       } catch (err) {
@@ -210,17 +219,17 @@ export default function AdminDashboard() {
         {/* ── Page Header ─────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Overview</h1>
+            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Visão Geral</h1>
             <p className="text-sm text-slate-500 mt-1">
-              Welcome back, {user?.name || "Admin"}. Here is what's happening today.
+              Bem-vindo de volta, {user?.name || "Administrador"}. Aqui está o que está acontecendo hoje.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <button className="h-9 px-4 py-2 border border-slate-200 bg-white rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-              Download Report
+              Baixar Relatório
             </button>
             <button className="h-9 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">
-              New Appointment
+              Nova Consulta
             </button>
           </div>
         </div>
@@ -241,34 +250,34 @@ export default function AdminDashboard() {
           <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-base font-semibold text-slate-900">Traffic Analysis</h3>
-                <p className="text-sm text-slate-500 mt-1">Patient visits and appointments over the last 7 days</p>
+                <h3 className="text-base font-semibold text-slate-900">Análise de Tráfego</h3>
+                <p className="text-sm text-slate-500 mt-1">Visitas de pacientes e consultas nos últimos 7 dias</p>
               </div>
             </div>
             <div className="flex-1 min-h-[300px] flex items-center justify-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
               <div className="text-center">
                 <BarChart3 className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                <p className="text-sm font-medium text-slate-500">No telemetry data available</p>
-                <p className="text-xs text-slate-400 mt-1">Sufficient traffic data will appear here soon.</p>
+                <p className="text-sm font-medium text-slate-500">Nenhum dado de telemetria disponível</p>
+                <p className="text-xs text-slate-400 mt-1">Dados de tráfego suficientes aparecerão aqui em breve.</p>
               </div>
             </div>
           </div>
 
           {/* Appointment Status Pie */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
-            <h3 className="text-base font-semibold text-slate-900">Appointment Status</h3>
-            <p className="text-sm text-slate-500 mt-1">Distribution for current month</p>
+            <h3 className="text-base font-semibold text-slate-900">Status das Consultas</h3>
+            <p className="text-sm text-slate-500 mt-1">Distribuição para o mês atual</p>
 
             <div className="flex-1 flex flex-col items-center justify-center min-h-[220px] my-4 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
               <PieChart className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-              <p className="text-sm font-medium text-slate-500">No appointment data</p>
+              <p className="text-sm font-medium text-slate-500">Sem dados de consultas</p>
             </div>
 
             <div className="space-y-3 mt-auto opacity-50 pointer-events-none">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2.5 text-slate-400">
                   <span className="w-2.5 h-2.5 rounded-full bg-slate-200" />
-                  No data
+                  Sem dados
                 </span>
                 <span className="font-medium text-slate-500">0%</span>
               </div>
@@ -283,15 +292,15 @@ export default function AdminDashboard() {
           <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm">
             <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
               <div>
-                <h3 className="text-base font-semibold text-slate-900">Recent Activity</h3>
-                <p className="text-sm text-slate-500 mt-0.5">Latest system events</p>
+                <h3 className="text-base font-semibold text-slate-900">Atividade Recente</h3>
+                <p className="text-sm text-slate-500 mt-0.5">Eventos mais recentes do sistema</p>
               </div>
-              <button className="text-sm text-blue-600 font-medium hover:text-blue-700">View All</button>
+              <button className="text-sm text-blue-600 font-medium hover:text-blue-700">Ver Todos</button>
             </div>
 
             <div className="divide-y divide-slate-100">
               {recentActivity.length === 0 ? (
-                <div className="px-6 py-8 text-center text-sm text-slate-500">No recent activity</div>
+                <div className="px-6 py-8 text-center text-sm text-slate-500">Nenhuma atividade recente</div>
               ) : (
                 recentActivity.map((a, i) => {
                   const IconComp = TYPE_ICON[a.type] || Info;
@@ -316,7 +325,7 @@ export default function AdminDashboard() {
 
           {/* Quick Actions */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-            <h3 className="text-base font-semibold text-slate-900 mb-5">Quick Links</h3>
+            <h3 className="text-base font-semibold text-slate-900 mb-5">Links Rápidos</h3>
 
             <div className="space-y-3">
               {QUICK_ACTIONS.map((action) => {
@@ -343,10 +352,10 @@ export default function AdminDashboard() {
 
             {/* Mini system health indicator */}
             <div className="mt-8 pt-6 border-t border-slate-100">
-              <h4 className="text-sm font-semibold text-slate-900 mb-4">System Status</h4>
+              <h4 className="text-sm font-semibold text-slate-900 mb-4">Status do Sistema</h4>
               <div className="space-y-3">
                 <div className="px-4 py-6 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50 text-center">
-                  <p className="text-sm font-medium text-slate-500">Health checks not configured for this environment</p>
+                  <p className="text-sm font-medium text-slate-500">Verificações de saúde não configuradas para este ambiente</p>
                 </div>
               </div>
             </div>

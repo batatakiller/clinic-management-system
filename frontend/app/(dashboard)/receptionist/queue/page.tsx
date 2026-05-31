@@ -25,6 +25,15 @@ const STATUS_COLORS: Record<string, string> = {
   no_show: "bg-gray-100 text-gray-700 border-gray-200",
 };
 
+const STATUS_TRANSLATION: Record<string, string> = {
+  pending: "Pendente",
+  confirmed: "Confirmada",
+  "in-progress": "Em Atendimento",
+  completed: "Concluída",
+  cancelled: "Cancelada",
+  no_show: "Não Compareceu",
+};
+
 export default function ReceptionistQueuePage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "in-progress">("all");
@@ -74,8 +83,8 @@ export default function ReceptionistQueuePage() {
     <DashboardLayout requiredRole="receptionist">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">Appointment Queue</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Manage today's appointment queue</p>
+          <h1 className="text-xl font-bold text-foreground">Fila de Consultas</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Gerencie a fila de consultas de hoje</p>
         </div>
         <button
           onClick={fetchAppointments}
@@ -83,7 +92,7 @@ export default function ReceptionistQueuePage() {
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-med disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh
+          Atualizar
         </button>
       </div>
 
@@ -101,7 +110,7 @@ export default function ReceptionistQueuePage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Scheduled</p>
+              <p className="text-xs text-muted-foreground">Agendadas</p>
               <p className="text-2xl font-bold text-blue-600">{stats.scheduled}</p>
             </div>
             <Clock className="w-8 h-8 text-blue-600 opacity-20" />
@@ -110,7 +119,7 @@ export default function ReceptionistQueuePage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">In Progress</p>
+              <p className="text-xs text-muted-foreground">Em Atendimento</p>
               <p className="text-2xl font-bold text-amber-600">{stats.inProgress}</p>
             </div>
             <AlertCircle className="w-8 h-8 text-amber-600 opacity-20" />
@@ -119,7 +128,7 @@ export default function ReceptionistQueuePage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Completed</p>
+              <p className="text-xs text-muted-foreground">Concluídas</p>
               <p className="text-2xl font-bold text-emerald-600">{stats.completed}</p>
             </div>
             <CheckCircle className="w-8 h-8 text-emerald-600 opacity-20" />
@@ -138,7 +147,7 @@ export default function ReceptionistQueuePage() {
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
               }`}
           >
-            {f === "all" ? "All" : f.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())}
+            {f === "all" ? "Todos" : f === "pending" ? "Pendentes" : f === "confirmed" ? "Confirmadas" : f === "in-progress" ? "Em Atendimento" : f}
           </button>
         ))}
       </div>
@@ -148,12 +157,12 @@ export default function ReceptionistQueuePage() {
         {loading ? (
           <div className="p-12 text-center">
             <Clock className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4 animate-pulse" />
-            <p className="text-muted-foreground">Loading queue...</p>
+            <p className="text-muted-foreground">Carregando fila...</p>
           </div>
         ) : filteredAppointments.length === 0 ? (
           <div className="p-12 text-center">
             <Clock className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">No appointments in this category</p>
+            <p className="text-muted-foreground">Nenhuma consulta nesta categoria</p>
           </div>
         ) : (
           <div className="divide-y divide-border">
@@ -167,19 +176,19 @@ export default function ReceptionistQueuePage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground truncate">
-                    {appt.patientId?.name || "Unknown Patient"}
+                    {appt.patientId?.name || "Paciente Desconhecido"}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {appt.doctorId?.name || "Doctor"} • {appt.reason || "Appointment"}
+                    {appt.doctorId?.name || "Médico"} • {appt.reason || "Consulta"}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-sm font-medium text-foreground">{appt.timeSlot || "TBD"}</p>
+                    <p className="text-sm font-medium text-foreground">{appt.timeSlot || "A definir"}</p>
                     <span
                       className={`text-xs font-medium px-2 py-0.5 rounded-full border ${STATUS_COLORS[appt.status]}`}
                     >
-                      {appt.status.replace("-", " ")}
+                      {STATUS_TRANSLATION[appt.status] || appt.status}
                     </span>
                   </div>
                   <div className="text-xs text-muted-foreground">

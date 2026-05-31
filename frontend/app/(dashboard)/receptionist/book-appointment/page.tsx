@@ -54,7 +54,7 @@ export default function BookAppointmentPage() {
         setPatients(patientsRes.data || []);
       } catch (err) {
         console.error("Failed to fetch data:", err);
-        setError("Failed to load patients or doctors");
+        setError("Falha ao carregar pacientes ou médicos");
       } finally {
         setLoadingData(false);
       }
@@ -65,7 +65,7 @@ export default function BookAppointmentPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.patientId || !formData.doctorId || !formData.timeSlot || !formData.reason) {
-      setError("Please fill in all required fields");
+      setError("Por favor, preencha todos os campos obrigatórios");
       return;
     }
 
@@ -90,7 +90,7 @@ export default function BookAppointmentPage() {
         });
       }, 2000);
     } catch (err: any) {
-      setError(err.message || "Failed to book appointment. Please try again.");
+      setError(err.message || "Falha ao agendar consulta. Por favor, tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -112,7 +112,7 @@ export default function BookAppointmentPage() {
       <DashboardLayout requiredRole="receptionist">
         <div className="flex items-center justify-center min-h-[400px]">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <span className="ml-3 text-sm text-muted-foreground">Loading patients and doctors...</span>
+          <span className="ml-3 text-sm text-muted-foreground">Carregando pacientes e médicos...</span>
         </div>
       </DashboardLayout>
     );
@@ -121,14 +121,14 @@ export default function BookAppointmentPage() {
   return (
     <DashboardLayout requiredRole="receptionist">
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-foreground">Book Appointment</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">Schedule a new appointment for a patient</p>
+        <h1 className="text-xl font-bold text-foreground">Agendar Consulta</h1>
+        <p className="text-xs text-muted-foreground mt-0.5">Agende uma nova consulta para um paciente</p>
       </div>
 
       {success && (
         <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm flex items-center gap-2">
           <Calendar className="w-4 h-4" />
-          Appointment booked successfully!
+          Consulta agendada com sucesso!
         </div>
       )}
 
@@ -137,7 +137,7 @@ export default function BookAppointmentPage() {
           {/* Patient Selection */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Patient <span className="text-red-500">*</span>
+              Paciente <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.patientId}
@@ -145,7 +145,7 @@ export default function BookAppointmentPage() {
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
               required
             >
-              <option value="">Select Patient</option>
+              <option value="">Selecionar Paciente</option>
               {patients.map((patient) => (
                 <option key={patient._id} value={patient._id}>
                   {patient.name} - {patient.email}{patient.phone ? ` (${patient.phone})` : ""}
@@ -157,7 +157,7 @@ export default function BookAppointmentPage() {
           {/* Doctor Selection */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Doctor <span className="text-red-500">*</span>
+              Médico <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.doctorId}
@@ -165,10 +165,10 @@ export default function BookAppointmentPage() {
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
               required
             >
-              <option value="">Select Doctor</option>
+              <option value="">Selecionar Médico</option>
               {doctors.map((doctor) => (
                 <option key={doctor._id} value={doctor._id}>
-                  Dr. {doctor.name} - {doctor.specialization}
+                  Dr(a). {doctor.name} - {doctor.specialization}
                 </option>
               ))}
             </select>
@@ -177,7 +177,7 @@ export default function BookAppointmentPage() {
           {/* Date */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Date <span className="text-red-500">*</span>
+              Data <span className="text-red-500">*</span>
             </label>
             <input
               type="date"
@@ -192,7 +192,7 @@ export default function BookAppointmentPage() {
           {/* Time */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Time <span className="text-red-500">*</span>
+              Horário <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.timeSlot}
@@ -200,7 +200,7 @@ export default function BookAppointmentPage() {
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
               required
             >
-              <option value="">Select Time</option>
+              <option value="">Selecionar Horário</option>
               {TIME_SLOTS.map((t) => (
                 <option key={t} value={t}>{t}</option>
               ))}
@@ -210,13 +210,13 @@ export default function BookAppointmentPage() {
           {/* Reason */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Reason for Appointment <span className="text-red-500">*</span>
+              Motivo da Consulta <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-              placeholder="e.g., General Checkup, Follow-up, Consultation"
+              placeholder="Ex: Check-up Geral, Retorno, Consulta"
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
               required
             />
@@ -225,12 +225,12 @@ export default function BookAppointmentPage() {
           {/* Notes */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Notes (Optional)
+              Observações (Opcional)
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Any additional information..."
+              placeholder="Qualquer informação adicional..."
               rows={3}
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med resize-none"
             />
@@ -253,12 +253,12 @@ export default function BookAppointmentPage() {
             {loading ? (
               <>
                 <Clock className="w-4 h-4 animate-spin" />
-                Booking...
+                Agendando...
               </>
             ) : (
               <>
                 <Save className="w-4 h-4" />
-                Book Appointment
+                Agendar Consulta
               </>
             )}
           </button>
@@ -268,7 +268,7 @@ export default function BookAppointmentPage() {
             className="px-6 py-2.5 rounded-xl border border-border hover:bg-muted transition-med flex items-center gap-2"
           >
             <X className="w-4 h-4" />
-            Clear
+            Limpar
           </button>
         </div>
       </form>

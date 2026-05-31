@@ -41,11 +41,10 @@ export default function ProfilePage() {
                 method: "PUT",
                 body: JSON.stringify({ name: formData.name }),
             });
-            // Mocking context update since useAuth might not expose a direct user update method
-            setMessage({ type: "success", text: "Profile updated successfully." });
+            setMessage({ type: "success", text: "Perfil atualizado com sucesso." });
             setIsEditing(false);
         } catch (err: any) {
-            setMessage({ type: "error", text: "Failed to update profile. " + (err.message || "") });
+            setMessage({ type: "error", text: "Falha ao atualizar o perfil. " + (err.message || "") });
         } finally {
             setIsSaving(false);
         }
@@ -57,9 +56,9 @@ export default function ProfilePage() {
 
                 {/* Page Header */}
                 <div className="border-b border-slate-200 pb-5">
-                    <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">My Profile</h1>
+                    <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Meu Perfil</h1>
                     <p className="text-sm text-slate-500 mt-1">
-                        Manage your personal information and account settings
+                        Gerencie suas informações pessoais e configurações de conta
                     </p>
                 </div>
 
@@ -76,25 +75,27 @@ export default function ProfilePage() {
 
                             <div className="mt-4 pt-4 border-t border-slate-100 w-full">
                                 <span className={`inline-flex items-center px-2.5 py-1 rounded border border-transparent text-xs font-medium ${getRoleBadgeColor(user.role)}`}>
-                                    {ROLE_LABELS[user.role] || "User"}
+                                    {ROLE_LABELS[user.role] || "Usuário"}
                                 </span>
                             </div>
                         </div>
 
                         <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-4">Account Status</h3>
+                            <h3 className="text-sm font-semibold text-slate-900 mb-4">Status da Conta</h3>
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-500 flex items-center gap-2"><Shield className="w-4 h-4" /> Role Base</span>
-                                    <span className="font-medium text-slate-900 capitalize">{user.role}</span>
+                                    <span className="text-slate-500 flex items-center gap-2"><Shield className="w-4 h-4" /> Nível de Acesso</span>
+                                    <span className="font-medium text-slate-900 capitalize">
+                                        {user.role === "admin" ? "Administrador" : user.role === "doctor" ? "Médico" : user.role === "receptionist" ? "Recepcionista" : "Paciente"}
+                                    </span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="text-slate-500 flex items-center gap-2"><CheckCircleIcon className="w-4 h-4 text-emerald-500" /> Status</span>
-                                    <span className="font-medium text-emerald-600">Active</span>
+                                    <span className="font-medium text-emerald-600">Ativo</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-500 flex items-center gap-2"><Calendar className="w-4 h-4" /> Member Since</span>
-                                    <span className="font-medium text-slate-900">Recent</span>
+                                    <span className="text-slate-500 flex items-center gap-2"><Calendar className="w-4 h-4" /> Membro Desde</span>
+                                    <span className="font-medium text-slate-900">Recente</span>
                                 </div>
                             </div>
                         </div>
@@ -104,18 +105,18 @@ export default function ProfilePage() {
                     <div className="md:col-span-2">
                         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                                <h3 className="text-base font-semibold text-slate-900">Personal Information</h3>
+                                <h3 className="text-base font-semibold text-slate-900">Informações Pessoais</h3>
                                 {!isEditing ? (
                                     <button onClick={() => setIsEditing(true)} className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm">
-                                        Edit Profile
+                                        Editar Perfil
                                     </button>
                                 ) : (
                                     <div className="flex items-center gap-2">
                                         <button onClick={() => { setIsEditing(false); setFormData({ name: user.name, email: user.email, phone: formData.phone }); }} disabled={isSaving} className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">
-                                            Cancel
+                                            Cancelar
                                         </button>
                                         <button onClick={handleSave} disabled={isSaving} className="px-4 py-1.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2">
-                                            {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Save
+                                            {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Salvar
                                         </button>
                                     </div>
                                 )}
@@ -132,11 +133,11 @@ export default function ProfilePage() {
 
                                     {/* Name */}
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Full Name</label>
+                                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Nome Completo</label>
                                         <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-colors ${isEditing ? "bg-white border-blue-400 ring-4 ring-blue-500/10" : "bg-slate-50 border-slate-200"}`}>
                                             <User className={`w-4 h-4 ${isEditing ? "text-blue-500" : "text-slate-400"}`} />
                                             {isEditing ? (
-                                                <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none" placeholder="Your Name" />
+                                                <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none" placeholder="Seu Nome" />
                                             ) : (
                                                 <span className="text-sm font-medium text-slate-900">{formData.name}</span>
                                             )}
@@ -145,7 +146,7 @@ export default function ProfilePage() {
 
                                     {/* Email */}
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Email Address</label>
+                                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Endereço de E-mail</label>
                                         <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border bg-slate-50 border-slate-200 opacity-80 cursor-not-allowed`}>
                                             <Mail className="w-4 h-4 text-slate-400" />
                                             <span className="text-sm font-medium text-slate-900">{formData.email}</span>
@@ -154,29 +155,27 @@ export default function ProfilePage() {
 
                                     {/* Phone mock */}
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Phone Number</label>
+                                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Número de Telefone</label>
                                         <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-colors ${isEditing ? "bg-white border-blue-400 ring-4 ring-blue-500/10" : "bg-slate-50 border-slate-200"}`}>
                                             <Phone className={`w-4 h-4 ${isEditing ? "text-blue-500" : "text-slate-400"}`} />
                                             {isEditing ? (
-                                                <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none" placeholder="+1 (555) 000-0000" />
+                                                <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none" placeholder="+55 (11) 00000-0000" />
                                             ) : (
-                                                <span className={`text-sm font-medium ${formData.phone ? "text-slate-900" : "text-slate-500"}`}>{formData.phone || "Not provided"}</span>
+                                                <span className={`text-sm font-medium ${formData.phone ? "text-slate-900" : "text-slate-500"}`}>{formData.phone || "Não fornecido"}</span>
                                             )}
                                         </div>
                                     </div>
-
-
 
                                 </div>
 
                                 {/* Bio Area */}
                                 <div className="mt-6">
-                                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Bio / Notes</label>
+                                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Biografia / Notas</label>
                                     <div className={`px-3 py-3 rounded-lg border min-h-[100px] transition-colors ${isEditing ? "bg-white border-blue-400 ring-4 ring-blue-500/10" : "bg-slate-50 border-slate-200"}`}>
                                         {isEditing ? (
-                                            <textarea className="w-full h-full min-h-[80px] bg-transparent text-sm text-slate-900 outline-none resize-none" placeholder="Write a short biography..." />
+                                            <textarea className="w-full h-full min-h-[80px] bg-transparent text-sm text-slate-900 outline-none resize-none" placeholder="Escreva uma breve biografia..." />
                                         ) : (
-                                            <p className="text-sm text-slate-500">Profile notes and biography can be added here upon editing.</p>
+                                            <p className="text-sm text-slate-500">Notas do perfil e biografia podem ser adicionadas aqui ao editar.</p>
                                         )}
                                     </div>
                                 </div>

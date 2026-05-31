@@ -30,6 +30,14 @@ interface Appointment {
   doctor?: { name: string; specialization?: string };
 }
 
+const STATUS_TRANSLATION: Record<string, string> = {
+  scheduled: "Agendada",
+  confirmed: "Confirmada",
+  completed: "Concluída",
+  cancelled: "Cancelada",
+  "no-show": "Não Compareceu",
+};
+
 export default function PatientHistoryPage() {
   const { user } = useAuth();
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
@@ -42,7 +50,7 @@ export default function PatientHistoryPage() {
       try {
         setLoading(true);
         if (!user?._id) {
-          setError("User not authenticated");
+          setError("Usuário não autenticado");
           return;
         }
 
@@ -62,7 +70,7 @@ export default function PatientHistoryPage() {
         setPrescriptions(rxData.data || []);
         setAppointments(patientAppointments || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load history");
+        setError(err instanceof Error ? err.message : "Falha ao carregar histórico");
       } finally {
         setLoading(false);
       }
@@ -101,7 +109,7 @@ export default function PatientHistoryPage() {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to download PDF: ${response.status}`);
+        throw new Error(`Falha ao baixar PDF: ${response.status}`);
       }
 
       const blob = await response.blob();
@@ -113,7 +121,7 @@ export default function PatientHistoryPage() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       const errorMsg =
-        err instanceof Error ? err.message : "Failed to download PDF";
+        err instanceof Error ? err.message : "Falha ao baixar PDF";
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -127,7 +135,7 @@ export default function PatientHistoryPage() {
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">
-              Loading your medical history...
+              Carregando seu histórico médico...
             </p>
           </div>
         </div>
@@ -139,10 +147,10 @@ export default function PatientHistoryPage() {
     <DashboardLayout requiredRole="patient">
       <div className="mb-6">
         <h1 className="text-xl font-bold text-foreground">
-          My Medical History
+          Meu Histórico Médico
         </h1>
         <p className="text-xs text-muted-foreground mt-0.5">
-          View your complete medical records
+          Visualize seus registros médicos completos
         </p>
       </div>
 
@@ -163,7 +171,7 @@ export default function PatientHistoryPage() {
               <p className="text-2xl font-bold text-foreground">
                 {prescriptions.length}
               </p>
-              <p className="text-xs text-muted-foreground">Prescriptions</p>
+              <p className="text-xs text-muted-foreground">Prescrições</p>
             </div>
           </div>
         </div>
@@ -176,7 +184,7 @@ export default function PatientHistoryPage() {
               <p className="text-2xl font-bold text-foreground">
                 {appointments.length}
               </p>
-              <p className="text-xs text-muted-foreground">Appointments</p>
+              <p className="text-xs text-muted-foreground">Consultas</p>
             </div>
           </div>
         </div>
@@ -185,7 +193,7 @@ export default function PatientHistoryPage() {
       {/* Prescriptions History */}
       <div className="mb-6">
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
-          <FileText className="w-4 h-4" /> Prescription History
+          <FileText className="w-4 h-4" /> Histórico de Prescrições
         </h2>
         {prescriptions.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -208,7 +216,7 @@ export default function PatientHistoryPage() {
                   <button
                     onClick={() => downloadPDF(rx)}
                     className="p-2 rounded-lg hover:bg-muted transition-med"
-                    title="Download PDF"
+                    title="Baixar PDF"
                   >
                     <Download className="w-4 h-4 text-muted-foreground" />
                   </button>
@@ -225,7 +233,7 @@ export default function PatientHistoryPage() {
                   ))}
                   {rx.medicines.length > 3 && (
                     <p className="text-xs text-muted-foreground">
-                      +{rx.medicines.length - 3} more medicines
+                      +{rx.medicines.length - 3} mais medicamentos
                     </p>
                   )}
                 </div>
@@ -235,7 +243,7 @@ export default function PatientHistoryPage() {
         ) : (
           <div className="med-card p-8 text-center">
             <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-muted-foreground">No prescriptions yet</p>
+            <p className="text-muted-foreground">Nenhuma prescrição ainda</p>
           </div>
         )}
       </div>
@@ -243,7 +251,7 @@ export default function PatientHistoryPage() {
       {/* Appointments History */}
       <div>
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
-          <Calendar className="w-4 h-4" /> Appointment History
+          <Calendar className="w-4 h-4" /> Histórico de Consultas
         </h2>
         {appointments.length > 0 ? (
           <div className="med-card overflow-hidden">
@@ -282,7 +290,7 @@ export default function PatientHistoryPage() {
                           : "bg-blue-100 text-blue-700"
                     }`}
                   >
-                    {appt.status}
+                    {STATUS_TRANSLATION[appt.status?.toLowerCase()] || appt.status}
                   </span>
                 </div>
               ))}
@@ -291,7 +299,7 @@ export default function PatientHistoryPage() {
         ) : (
           <div className="med-card p-8 text-center">
             <Calendar className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-muted-foreground">No appointment history yet</p>
+            <p className="text-muted-foreground">Nenhuma consulta no histórico ainda</p>
           </div>
         )}
       </div>

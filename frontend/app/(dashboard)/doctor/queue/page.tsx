@@ -25,6 +25,15 @@ const STATUS_COLORS: Record<string, string> = {
   no_show: "bg-gray-100 text-gray-700",
 };
 
+const STATUS_TRANSLATION: Record<string, string> = {
+  pending: "Pendente",
+  confirmed: "Confirmada",
+  "in-progress": "Em Atendimento",
+  completed: "Concluída",
+  cancelled: "Cancelada",
+  no_show: "Não Compareceu",
+};
+
 export default function DoctorQueuePage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [currentPatient, setCurrentPatient] = useState<string | null>(null);
@@ -101,8 +110,8 @@ export default function DoctorQueuePage() {
     <DashboardLayout requiredRole="doctor">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">Patient Queue</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Manage your patient queue for today</p>
+          <h1 className="text-xl font-bold text-foreground">Fila de Pacientes</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Gerencie sua fila de pacientes para hoje</p>
         </div>
         <button
           onClick={fetchAppointments}
@@ -110,7 +119,7 @@ export default function DoctorQueuePage() {
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-med disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh
+          Atualizar
         </button>
       </div>
 
@@ -120,7 +129,7 @@ export default function DoctorQueuePage() {
           <div className="med-card p-6 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
             <div className="flex items-center gap-2 mb-4">
               <Clock className="w-5 h-5 text-primary" />
-              <h2 className="font-semibold text-foreground">Current Patient</h2>
+              <h2 className="font-semibold text-foreground">Paciente Atual</h2>
             </div>
 
             {currentPatient ? (
@@ -134,12 +143,12 @@ export default function DoctorQueuePage() {
                         {patient.patientId?.name?.split(" ").map((n) => n[0]).join("").slice(0, 2) || "P"}
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-foreground">{patient.patientId?.name || "Unknown Patient"}</h3>
+                        <h3 className="text-lg font-bold text-foreground">{patient.patientId?.name || "Paciente Desconhecido"}</h3>
                         <p className="text-sm text-muted-foreground">
-                          {patient.reason || "Appointment"} • {patient.timeSlot || "TBD"}
+                          {patient.reason || "Consulta"} • {patient.timeSlot || "A definir"}
                         </p>
                         <span className={`inline-block mt-1 text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_COLORS[patient.status]}`}>
-                          {patient.status.replace("-", " ")}
+                          {STATUS_TRANSLATION[patient.status] || patient.status}
                         </span>
                       </div>
                     </div>
@@ -151,11 +160,11 @@ export default function DoctorQueuePage() {
                             className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-med shadow-md"
                           >
                             <CheckCircle className="w-4 h-4" />
-                            Complete
+                            Concluir
                           </button>
                           <button className="flex items-center gap-2 px-4 py-2.5 bg-muted text-muted-foreground rounded-xl text-sm font-semibold hover:bg-muted/80 transition-med">
                             <SkipForward className="w-4 h-4" />
-                            Skip
+                            Pular
                           </button>
                         </>
                       )}
@@ -166,8 +175,8 @@ export default function DoctorQueuePage() {
             ) : (
               <div className="py-8 text-center">
                 <User className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-                <p className="text-muted-foreground">No patient currently in consultation</p>
-                <p className="text-xs text-muted-foreground mt-1">Select a patient from the queue to start</p>
+                <p className="text-muted-foreground">Nenhum paciente em atendimento no momento</p>
+                <p className="text-xs text-muted-foreground mt-1">Selecione um paciente na fila para começar</p>
               </div>
             )}
           </div>
@@ -178,7 +187,7 @@ export default function DoctorQueuePage() {
           <div className="med-card p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">Waiting</p>
+                <p className="text-xs text-muted-foreground">Aguardando</p>
                 <p className="text-2xl font-bold text-blue-600">
                   {appointments.filter(a => ["pending", "confirmed"].includes(a.status)).length}
                 </p>
@@ -189,7 +198,7 @@ export default function DoctorQueuePage() {
           <div className="med-card p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">In Progress</p>
+                <p className="text-xs text-muted-foreground">Em Atendimento</p>
                 <p className="text-2xl font-bold text-amber-600">
                   {appointments.filter(a => a.status === "in-progress").length}
                 </p>
@@ -200,7 +209,7 @@ export default function DoctorQueuePage() {
           <div className="med-card p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">Completed</p>
+                <p className="text-xs text-muted-foreground">Concluídos</p>
                 <p className="text-2xl font-bold text-emerald-600">
                   {appointments.filter(a => a.status === "completed").length}
                 </p>
@@ -213,17 +222,17 @@ export default function DoctorQueuePage() {
 
       {/* Queue List */}
       <div className="mt-5">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Upcoming Patients</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Próximos Pacientes</h2>
         <div className="med-card overflow-hidden">
           {loading ? (
             <div className="p-12 text-center">
               <Clock className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4 animate-pulse" />
-              <p className="text-muted-foreground">Loading queue...</p>
+              <p className="text-muted-foreground">Carregando fila...</p>
             </div>
           ) : sortedAppointments.filter(a => !["completed", "cancelled", "no_show"].includes(a.status)).length === 0 ? (
             <div className="p-12 text-center">
               <CheckCircle className="w-12 h-12 text-emerald-600 opacity-30 mx-auto mb-4" />
-              <p className="text-muted-foreground">All patients seen for today!</p>
+              <p className="text-muted-foreground">Todos os pacientes atendidos por hoje!</p>
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -238,16 +247,16 @@ export default function DoctorQueuePage() {
                     {appt.patientId?.name?.split(" ").map((n) => n[0]).join("").slice(0, 2) || "P"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">{appt.patientId?.name || "Unknown Patient"}</p>
+                    <p className="font-medium text-foreground">{appt.patientId?.name || "Paciente Desconhecido"}</p>
                     <p className="text-xs text-muted-foreground">
-                      {appt.reason || "Appointment"} • {appt.timeSlot || "TBD"}
+                      {appt.reason || "Consulta"} • {appt.timeSlot || "A definir"}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="text-sm font-medium text-foreground">{appt.timeSlot || "TBD"}</p>
+                      <p className="text-sm font-medium text-foreground">{appt.timeSlot || "A definir"}</p>
                       <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[appt.status]}`}>
-                        {appt.status.replace("-", " ")}
+                        {STATUS_TRANSLATION[appt.status] || appt.status}
                       </span>
                     </div>
                     {["pending", "confirmed"].includes(appt.status) && currentPatient !== appt._id && (
@@ -255,7 +264,7 @@ export default function DoctorQueuePage() {
                         onClick={() => handleStartConsultation(appt._id)}
                         className="px-4 py-2 bg-primary text-white rounded-lg text-xs font-medium hover:bg-primary/90 transition-med"
                       >
-                        Start
+                        Iniciar
                       </button>
                     )}
                   </div>

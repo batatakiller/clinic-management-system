@@ -170,7 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!data || !data.user || !data.user.role) {
           dispatch({
             type: "AUTH_ERROR",
-            payload: "Invalid response from server.",
+            payload: "Resposta inválida do servidor.",
           });
           return;
         }
@@ -189,14 +189,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const errorData = await res.json().catch(() => ({}));
         dispatch({
           type: "AUTH_ERROR",
-          payload: errorData.message || "Invalid email or password.",
+          payload: errorData.message || "E-mail ou senha inválidos.",
         });
       }
     } catch (err: unknown) {
       const errorMsg =
         err instanceof Error
           ? err.message
-          : "Network error. Server might be down.";
+          : "Erro de rede. O servidor pode estar fora do ar.";
       dispatch({
         type: "AUTH_ERROR",
         payload: errorMsg,
@@ -231,14 +231,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const err = (await res.json()) as { message?: string };
         dispatch({
           type: "AUTH_ERROR",
-          payload: err.message ?? "Registration failed",
+          payload: err.message ?? "Falha no cadastro",
         });
       }
     } catch (err: unknown) {
       const errorMsg =
         err instanceof Error
           ? err.message
-          : "Network error. Server might be down.";
+          : "Erro de rede. O servidor pode estar fora do ar.";
       dispatch({
         type: "AUTH_ERROR",
         payload: errorMsg,
@@ -280,8 +280,8 @@ export function getRoleDashboardPath(role: UserRole): string {
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  admin: "Administrator",
-  doctor: "Doctor",
-  receptionist: "Receptionist",
-  patient: "Patient",
+  admin: "Administrador",
+  doctor: "Médico",
+  receptionist: "Recepcionista",
+  patient: "Paciente",
 };

@@ -7,7 +7,7 @@ export default function LoginPage() {
         <Suspense fallback={
             <div className="w-full max-w-md flex flex-col items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
-                <p className="text-sm text-muted-foreground">Loading login…</p>
+                <p className="text-sm text-muted-foreground">Carregando login…</p>
             </div>
         }>
             <LoginForm />

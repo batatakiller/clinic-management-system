@@ -23,6 +23,13 @@ const STATUS_BADGE: Record<string, string> = {
   cancelled: "bg-red-50 text-red-700 border-red-100",
 };
 
+const STATUS_TRANSLATION: Record<string, string> = {
+  scheduled: "Agendada",
+  "in-progress": "Em Atendimento",
+  completed: "Concluída",
+  cancelled: "Cancelada",
+};
+
 interface AppointmentData {
   id?: string; _id?: string; date?: string; time?: string; status?: string;
   doctor?: { _id: string } | string; patient?: { name: string; age?: number | string };
@@ -51,9 +58,9 @@ export default function DoctorDashboard() {
         const todayApps = myAppts.filter((a) => a.date?.startsWith(today));
         setStats({ todayPatients: todayApps.length.toString(), appointments: myAppts.length.toString(), prescriptions: (rxRes.data?.length || 0).toString() });
         setQueue(todayApps.slice(0, 5).map((a) => ({
-          name: a.patient?.name || "Unknown Patient",
+          name: a.patient?.name || "Paciente Desconhecido",
           age: a.patient?.age || "--",
-          time: a.time || "TBD",
+          time: a.time || "A definir",
           status: a.status || "scheduled",
         })));
       } catch (e) { console.error(e); }
@@ -68,17 +75,17 @@ export default function DoctorDashboard() {
         {/* ── Page Header ─────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Physician Dashboard</h1>
+            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Painel do Médico</h1>
             <p className="text-sm text-slate-500 mt-1">
-              Welcome back, Dr. {user?.name?.split(" ")[0] || "Doctor"}. Here is your schedule for today.
+              Bem-vindo(a) de volta, Dr(a). {user?.name?.split(" ")[0] || "Médico(a)"}. Aqui está sua agenda de hoje.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/doctor/ai" className="h-9 px-4 flex items-center justify-center gap-2 border border-slate-200 bg-white rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-              AI Symptom Checker
+              Verificador de Sintomas por IA
             </Link>
             <Link href="/doctor/queue" className="h-9 px-4 flex items-center justify-center bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
-              View Full Queue
+              Ver Fila Completa
             </Link>
           </div>
         </div>
@@ -86,10 +93,10 @@ export default function DoctorDashboard() {
         {/* ── Stats ─────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {[
-            { label: "Today's Patients", value: stats.todayPatients, icon: Users, change: "+3 v.s yesterday", trend: "up" },
-            { label: "Total Appointments", value: stats.appointments, icon: Calendar, change: "+12% this week", trend: "up" },
-            { label: "Avg. Wait Time", value: "18m", icon: Clock, change: "-2m target", trend: "down" },
-            { label: "Prescriptions Issued", value: stats.prescriptions, icon: ClipboardList, change: "Stable", trend: "neutral" },
+            { label: "Pacientes de Hoje", value: stats.todayPatients, icon: Users, change: "+3 em relação a ontem", trend: "up" },
+            { label: "Total de Consultas", value: stats.appointments, icon: Calendar, change: "+12% esta semana", trend: "up" },
+            { label: "Tempo Médio de Espera", value: "18m", icon: Clock, change: "-2m da meta", trend: "down" },
+            { label: "Prescrições Emitidas", value: stats.prescriptions, icon: ClipboardList, change: "Estável", trend: "neutral" },
           ].map((s) => {
             const Icon = s.icon;
             const TrendIcon = s.trend === "up" ? TrendingUp : s.trend === "down" ? TrendingDown : Activity;
@@ -121,8 +128,8 @@ export default function DoctorDashboard() {
           <div className="xl:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-semibold text-slate-900">Today's Appointment Queue</h3>
-                <p className="text-sm text-slate-500 mt-0.5">{stats.todayPatients} scheduled visits</p>
+                <h3 className="text-base font-semibold text-slate-900">Fila de Consultas de Hoje</h3>
+                <p className="text-sm text-slate-500 mt-0.5">{stats.todayPatients} consultas agendadas</p>
               </div>
             </div>
             <div className="divide-y divide-slate-100 flex-1">
@@ -133,16 +140,16 @@ export default function DoctorDashboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900">{p.name}</p>
-                    <p className="text-sm text-slate-500 mt-0.5">Age: {p.age} • {p.time}</p>
+                    <p className="text-sm text-slate-500 mt-0.5">Idade: {p.age} • {p.time}</p>
                   </div>
-                  <span className={`text-xs font-medium px-2.5 py-1 rounded-md border capitalize ${STATUS_BADGE[p.status] || STATUS_BADGE.scheduled}`}>
-                    {p.status}
+                  <span className={`text-xs font-medium px-2.5 py-1 rounded-md border ${STATUS_BADGE[p.status] || STATUS_BADGE.scheduled}`}>
+                    {STATUS_TRANSLATION[p.status] || p.status}
                   </span>
                 </div>
               )) : (
                 <div className="py-16 text-center">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500/50 mx-auto mb-3" />
-                  <p className="text-sm font-medium text-slate-600">No patients queued for today</p>
+                  <p className="text-sm font-medium text-slate-600">Nenhum paciente na fila hoje</p>
                 </div>
               )}
             </div>
@@ -155,12 +162,12 @@ export default function DoctorDashboard() {
               <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-6 flex-shrink-0">
                 <Bot className="w-6 h-6 text-blue-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">AI Diagnostic Assist</h3>
+              <h3 className="text-xl font-semibold mb-2">Assistente de Diagnóstico por IA</h3>
               <p className="text-slate-400 text-sm leading-relaxed mb-8 flex-1">
-                Enter symptoms to generate potential differential diagnoses, analyze risk levels, and output structured reports powered by GPT-4o.
+                Insira os sintomas para gerar diagnósticos diferenciais potenciais, analisar níveis de risco e produzir relatórios estruturados com tecnologia GPT-4o.
               </p>
               <Link href="/doctor/ai" className="block w-full text-center py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
-                Launch Assistant
+                Iniciar Assistente
               </Link>
             </div>
           </div>
@@ -169,25 +176,25 @@ export default function DoctorDashboard() {
         {/* Charts */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-slate-900">Patient Load Forecast</h3>
-            <p className="text-sm text-slate-500 mt-1 mb-6">Estimated patient volume this week</p>
+            <h3 className="text-base font-semibold text-slate-900">Previsão de Carga de Pacientes</h3>
+            <p className="text-sm text-slate-500 mt-1 mb-6">Volume estimado de pacientes esta semana</p>
             <div className="flex-1 min-h-[240px] flex items-center justify-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50 mt-4">
               <div className="text-center">
                 <Activity className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                <p className="text-sm font-medium text-slate-500">No forecast data</p>
-                <p className="text-xs text-slate-400 mt-1">Sufficient patient volume data will appear here.</p>
+                <p className="text-sm font-medium text-slate-500">Sem dados de previsão</p>
+                <p className="text-xs text-slate-400 mt-1">Dados suficientes de volume de pacientes aparecerão aqui.</p>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-slate-900">Top Diagnoses</h3>
-            <p className="text-sm text-slate-500 mt-1 mb-6">Distribution over the last 6 months</p>
+            <h3 className="text-base font-semibold text-slate-900">Principais Diagnósticos</h3>
+            <p className="text-sm text-slate-500 mt-1 mb-6">Distribuição nos últimos 6 meses</p>
             <div className="flex-1 min-h-[240px] flex items-center justify-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50 mt-4">
               <div className="text-center">
                 <ClipboardList className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                <p className="text-sm font-medium text-slate-500">No diagnostic data</p>
-                <p className="text-xs text-slate-400 mt-1">Diagnosis trends will appear here.</p>
+                <p className="text-sm font-medium text-slate-500">Sem dados de diagnóstico</p>
+                <p className="text-xs text-slate-400 mt-1">Tendências de diagnóstico aparecerão aqui.</p>
               </div>
             </div>
           </div>

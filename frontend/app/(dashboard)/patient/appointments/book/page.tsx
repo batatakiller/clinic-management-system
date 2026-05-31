@@ -13,13 +13,13 @@ interface Doctor {
 }
 
 const APPOINTMENT_TYPES = [
-  "General Checkup",
-  "Follow-up",
-  "Consultation",
-  "Emergency",
-  "Lab Review",
-  "Vaccination",
-  "Physical Exam",
+  "Check-up Geral",
+  "Retorno",
+  "Consulta",
+  "Emergência",
+  "Revisão de Exames",
+  "Vacinação",
+  "Exame Físico",
 ];
 
 const TIME_SLOTS = [
@@ -35,7 +35,7 @@ export default function PatientBookAppointmentPage() {
     doctorId: "",
     date: new Date().toISOString().split("T")[0],
     time: "",
-    type: "General Checkup",
+    type: "Check-up Geral",
     reason: "",
     notes: "",
   });
@@ -59,7 +59,7 @@ export default function PatientBookAppointmentPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.doctorId || !formData.time || !formData.reason) {
-      setError("Please fill in all required fields");
+      setError("Por favor, preencha todos os campos obrigatórios");
       return;
     }
 
@@ -86,13 +86,13 @@ export default function PatientBookAppointmentPage() {
           doctorId: "",
           date: new Date().toISOString().split("T")[0],
           time: "",
-          type: "General Checkup",
+          type: "Check-up Geral",
           reason: "",
           notes: "",
         });
       }, 2000);
     } catch (err) {
-      setError("Failed to book appointment. Please try again.");
+      setError("Falha ao agendar consulta. Por favor, tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -101,14 +101,14 @@ export default function PatientBookAppointmentPage() {
   return (
     <DashboardLayout requiredRole="patient">
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-foreground">Book Appointment</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">Schedule a new appointment with your doctor</p>
+        <h1 className="text-xl font-bold text-foreground">Agendar Consulta</h1>
+        <p className="text-xs text-muted-foreground mt-0.5">Agende uma nova consulta com seu médico</p>
       </div>
 
       {success && (
         <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm flex items-center gap-2">
           <Calendar className="w-4 h-4" />
-          Appointment booked successfully!
+          Consulta agendada com sucesso!
         </div>
       )}
 
@@ -117,7 +117,7 @@ export default function PatientBookAppointmentPage() {
           {/* Doctor Selection */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Select Doctor <span className="text-red-500">*</span>
+              Selecionar Médico <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.doctorId}
@@ -125,10 +125,10 @@ export default function PatientBookAppointmentPage() {
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
               required
             >
-              <option value="">Choose a doctor...</option>
+              <option value="">Escolha um médico...</option>
               {doctors.map((doc) => (
                 <option key={doc._id} value={doc._id}>
-                  {doc.name} - {doc.specialization || "General Practice"}
+                  {doc.name} - {doc.specialization || "Clínica Geral"}
                 </option>
               ))}
             </select>
@@ -137,7 +137,7 @@ export default function PatientBookAppointmentPage() {
           {/* Date */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Date <span className="text-red-500">*</span>
+              Data <span className="text-red-500">*</span>
             </label>
             <input
               type="date"
@@ -152,7 +152,7 @@ export default function PatientBookAppointmentPage() {
           {/* Time */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Time <span className="text-red-500">*</span>
+              Horário <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.time}
@@ -160,7 +160,7 @@ export default function PatientBookAppointmentPage() {
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
               required
             >
-              <option value="">Select a time slot</option>
+              <option value="">Selecione um horário</option>
               {TIME_SLOTS.map((t) => (
                 <option key={t} value={t}>{t}</option>
               ))}
@@ -170,7 +170,7 @@ export default function PatientBookAppointmentPage() {
           {/* Appointment Type */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Appointment Type
+              Tipo de Consulta
             </label>
             <select
               value={formData.type}
@@ -186,12 +186,12 @@ export default function PatientBookAppointmentPage() {
           {/* Reason */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Reason for Visit <span className="text-red-500">*</span>
+              Motivo da Visita <span className="text-red-500">*</span>
             </label>
             <textarea
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-              placeholder="Briefly describe why you need to see the doctor..."
+              placeholder="Descreva brevemente por que você precisa consultar o médico..."
               rows={3}
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med resize-none"
               required
@@ -201,12 +201,12 @@ export default function PatientBookAppointmentPage() {
           {/* Notes */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Additional Notes (Optional)
+              Observações Adicionais (Opcional)
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Any additional information you'd like to share..."
+              placeholder="Qualquer informação adicional que gostaria de compartilhar..."
               rows={2}
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med resize-none"
             />
@@ -229,12 +229,12 @@ export default function PatientBookAppointmentPage() {
             {loading ? (
               <>
                 <Clock className="w-4 h-4 animate-spin" />
-                Booking...
+                Agendando...
               </>
             ) : (
               <>
                 <Save className="w-4 h-4" />
-                Book Appointment
+                Agendar Consulta
               </>
             )}
           </button>
@@ -245,14 +245,14 @@ export default function PatientBookAppointmentPage() {
               doctorId: "",
               date: new Date().toISOString().split("T")[0],
               time: "",
-              type: "General Checkup",
+              type: "Check-up Geral",
               reason: "",
               notes: "",
             })}
             className="px-6 py-2.5 rounded-xl border border-border hover:bg-muted transition-med flex items-center gap-2"
           >
             <X className="w-4 h-4" />
-            Clear
+            Limpar
           </button>
         </div>
       </form>

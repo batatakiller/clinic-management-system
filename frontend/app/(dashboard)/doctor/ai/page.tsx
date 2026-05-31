@@ -39,10 +39,10 @@ const RISK_DOT: Record<string, string> = {
 };
 
 const SAMPLE_SYMPTOMS = [
-  "Chest pain, shortness of breath, sweating, nausea",
-  "Persistent headache, fever 38.5°C, stiff neck, sensitivity to light",
-  "Fatigue, excessive thirst, frequent urination, blurred vision",
-  "Sudden severe abdominal pain, vomiting, fever",
+  "Dor no peito, falta de ar, sudorese, náusea",
+  "Dor de cabeça persistente, febre 38.5°C, rigidez na nuca, sensibilidade à luz",
+  "Fadiga, sede excessiva, micção frequente, visão turva",
+  "Dor abdominal aguda súbita, vômitos, febre",
 ];
 
 export default function SymptomCheckerPage() {
@@ -58,7 +58,7 @@ export default function SymptomCheckerPage() {
     e.preventDefault();
     if (!symptoms.trim() || symptoms.trim().length < 5) {
       setError(
-        "Please describe the symptoms in more detail (at least 5 characters).",
+        "Por favor, descreva os sintomas com mais detalhes (mínimo de 5 caracteres).",
       );
       return;
     }
@@ -99,29 +99,29 @@ export default function SymptomCheckerPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message ?? data.error ?? "AI service error.");
+        setError(data.message ?? data.error ?? "Erro no serviço de IA.");
         return;
       }
       // Map API response to UI result format
       setResult({
-        summary: `${data.data?.condition || "Unknown"} - Risk Level: ${data.data?.riskLevel || "unknown"}`,
+        summary: `${data.data?.condition || "Desconhecido"} - Nível de Risco: ${{ high: "Alto", medium: "Médio", low: "Baixo" }[data.data?.riskLevel?.toLowerCase() as string] || data.data?.riskLevel || "desconhecido"}`,
         possible_conditions: (data.data?.differentialDiagnoses || []).map(
           (c: string) => ({
             name: c,
             risk: "Medium",
-            probability: "Possible",
-            description: "Possible condition based on symptoms",
+            probability: "Possível",
+            description: "Condição possível com base nos sintomas",
           }),
         ),
         recommended_tests: data.data?.suggestedTests || [],
         red_flags: data.data?.redFlags || [],
-        next_steps: data.data?.recommendations || "Consult with a specialist",
+        next_steps: data.data?.recommendations || "Consulte um especialista",
       });
     } catch (err) {
       const errorMsg =
         err instanceof Error
           ? err.message
-          : "Network error. Please check your connection and try again.";
+          : "Erro de rede. Por favor, verifique sua conexão e tente novamente.";
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -145,10 +145,10 @@ export default function SymptomCheckerPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">
-              AI Symptom Checker
+              Verificador de Sintomas por IA
             </h1>
             <p className="text-xs text-muted-foreground">
-              Powered by GPT-4o · Differential diagnosis assistant
+              Alimentado por GPT-4o · Assistente de diagnóstico diferencial
             </p>
           </div>
         </div>
@@ -158,9 +158,9 @@ export default function SymptomCheckerPage() {
       <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200 mb-6">
         <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
         <p className="text-xs text-amber-800">
-          <strong>Clinical Decision Support Only:</strong> This AI assists with
-          differential diagnosis. Always apply clinical judgment. Not a
-          replacement for physical examination.
+          <strong>Apenas Suporte a Decisões Clínicas:</strong> Esta IA auxilia no
+          diagnóstico diferencial. Sempre aplique o julgamento clínico. Não substitui
+          o exame físico.
         </p>
       </div>
 
@@ -170,11 +170,11 @@ export default function SymptomCheckerPage() {
           <form onSubmit={handleSubmit} className="med-card p-5 space-y-4">
             <div>
               <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
-                Patient Name (Optional)
+                Nome do Paciente (Opcional)
               </label>
               <input
                 className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
-                placeholder="e.g. Maria Santos"
+                placeholder="Ex: Maria Santos"
                 value={patientName}
                 onChange={(e) => setPatientName(e.target.value)}
               />
@@ -183,7 +183,7 @@ export default function SymptomCheckerPage() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Symptoms Description *
+                  Descrição dos Sintomas *
                 </label>
                 <span className="text-[10px] text-muted-foreground">
                   {charCount}/500
@@ -192,7 +192,7 @@ export default function SymptomCheckerPage() {
               <textarea
                 rows={5}
                 className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med resize-none placeholder:text-muted-foreground/50"
-                placeholder="Describe symptoms in detail: duration, severity, associated symptoms, relevant history…"
+                placeholder="Descreva os sintomas em detalhes: duração, gravidade, sintomas associados, histórico relevante…"
                 value={symptoms}
                 maxLength={500}
                 onChange={(e) => {
@@ -205,7 +205,7 @@ export default function SymptomCheckerPage() {
             {/* Quick fill */}
             <div>
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                Quick Examples
+                Exemplos Rápidos
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {SAMPLE_SYMPTOMS.map((s, i) => (
@@ -226,7 +226,7 @@ export default function SymptomCheckerPage() {
 
             <div>
               <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
-                Response Language
+                Idioma de Resposta
               </label>
               <div className="flex gap-2">
                 {["English", "Urdu"].map((l) => (
@@ -259,7 +259,7 @@ export default function SymptomCheckerPage() {
                 ) : (
                   <Send className="w-4 h-4" />
                 )}
-                {loading ? "Analyzing Symptoms…" : "Analyze with AI"}
+                {loading ? "Analisando Sintomas…" : "Analisar com IA"}
               </button>
               {result && (
                 <button
@@ -280,8 +280,8 @@ export default function SymptomCheckerPage() {
             <div className="med-card p-12 text-center h-full flex flex-col items-center justify-center">
               <Stethoscope className="w-14 h-14 text-muted-foreground/20 mb-4" />
               <p className="text-muted-foreground text-sm">
-                Enter symptoms on the left to get AI-powered differential
-                diagnosis
+                Insira os sintomas à esquerda para obter um diagnóstico diferencial
+                alimentado por IA
               </p>
             </div>
           )}
@@ -291,10 +291,10 @@ export default function SymptomCheckerPage() {
               <Loader2 className="w-12 h-12 text-primary animate-spin" />
               <div>
                 <p className="font-medium text-foreground">
-                  Analyzing symptoms…
+                  Analisando sintomas…
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Consulting AI medical knowledge base
+                  Consultando a base de conhecimento médico da IA
                 </p>
               </div>
             </div>
@@ -305,7 +305,7 @@ export default function SymptomCheckerPage() {
               {/* Summary */}
               <div className="med-card p-4 border-l-4 border-l-primary">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
-                  Clinical Overview
+                  Visão Geral Clínica
                 </p>
                 <p className="text-sm text-foreground leading-relaxed">
                   {result.summary}
@@ -315,7 +315,7 @@ export default function SymptomCheckerPage() {
               {/* Conditions */}
               <div className="med-card p-5">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                  Possible Conditions
+                  Condições Possíveis
                 </p>
                 <div className="space-y-3">
                   {result.possible_conditions?.map((c, i) => (
@@ -334,7 +334,7 @@ export default function SymptomCheckerPage() {
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${RISK_STYLES[c.risk] ?? "bg-gray-100 text-gray-600"}`}
                           >
-                            {c.risk} Risk
+                            Risco {c.risk === "High" ? "Alto" : c.risk === "Medium" ? "Médio" : "Baixo"}
                           </span>
                           <span className="text-xs text-muted-foreground ml-auto">
                             {c.probability}
@@ -353,7 +353,7 @@ export default function SymptomCheckerPage() {
               {result.red_flags?.length > 0 && (
                 <div className="med-card p-4 border border-red-200 bg-red-50/50">
                   <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                    <AlertCircle className="w-3.5 h-3.5" /> Red Flags
+                    <AlertCircle className="w-3.5 h-3.5" /> Sinais de Alerta
                   </p>
                   <ul className="space-y-1">
                     {result.red_flags.map((f, i) => (
@@ -373,7 +373,7 @@ export default function SymptomCheckerPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="med-card p-4">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                    Recommended Tests
+                    Exames Recomendados
                   </p>
                   <ul className="space-y-1">
                     {result.recommended_tests?.map((t, i) => (
@@ -389,7 +389,7 @@ export default function SymptomCheckerPage() {
                 </div>
                 <div className="med-card p-4 bg-emerald-50/50 border-emerald-100">
                   <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">
-                    Next Steps
+                    Próximos Passos
                   </p>
                   <p className="text-xs text-foreground leading-relaxed">
                     {result.next_steps}

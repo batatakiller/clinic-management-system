@@ -43,7 +43,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                         onClick={onClose}
                         className="absolute top-4 right-3 z-10 p-1.5 rounded-lg text-muted-foreground
                        hover:text-foreground hover:bg-sidebar-accent transition-med"
-                        aria-label="Close menu"
+                        aria-label="Fechar menu"
                     >
                         <X className="w-4 h-4" />
                     </button>

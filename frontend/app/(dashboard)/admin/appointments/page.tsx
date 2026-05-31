@@ -66,19 +66,35 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
 
 const TYPE_OPTIONS = [
   { value: "checkup", label: "Check-up" },
-  { value: "follow-up", label: "Follow-up" },
-  { value: "emergency", label: "Emergency" },
-  { value: "consultation", label: "Consultation" },
-  { value: "other", label: "Other" },
+  { value: "follow-up", label: "Retorno" },
+  { value: "emergency", label: "Emergência" },
+  { value: "consultation", label: "Consulta" },
+  { value: "other", label: "Outro" },
 ];
 
 const STATUS_OPTIONS = [
-  { value: "scheduled", label: "Scheduled" },
-  { value: "confirmed", label: "Confirmed" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
-  { value: "no-show", label: "No Show" },
+  { value: "scheduled", label: "Agendado" },
+  { value: "confirmed", label: "Confirmado" },
+  { value: "completed", label: "Concluído" },
+  { value: "cancelled", label: "Cancelado" },
+  { value: "no-show", label: "Falta" },
 ];
+
+const STATUS_LABELS: Record<string, string> = {
+  scheduled: "Agendado",
+  confirmed: "Confirmado",
+  completed: "Concluído",
+  cancelled: "Cancelado",
+  "no-show": "Falta",
+};
+
+const TYPE_LABELS: Record<string, string> = {
+  checkup: "Check-up",
+  "follow-up": "Retorno",
+  emergency: "Emergência",
+  consultation: "Consulta",
+  other: "Outro",
+};
 
 export default function ManageAppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -192,18 +208,18 @@ export default function ManageAppointmentsPage() {
       fetchData();
     } catch (error) {
       console.error("Failed to save appointment:", error);
-      alert("Failed to save appointment. Please try again.");
+      alert("Falha ao salvar a consulta. Por favor, tente novamente.");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this appointment?")) return;
+    if (!confirm("Tem certeza de que deseja excluir esta consulta?")) return;
     try {
       await apiFetch(`/api/appointments/${id}`, { method: "DELETE" });
       fetchData();
     } catch (error) {
       console.error("Failed to delete appointment:", error);
-      alert("Failed to delete appointment.");
+      alert("Falha ao excluir consulta.");
     }
   };
 
@@ -230,15 +246,15 @@ export default function ManageAppointmentsPage() {
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Admin</p>
-          <h1 className="text-xl font-extrabold text-slate-900">Manage Appointments</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Schedule and manage all clinic appointments</p>
+          <h1 className="text-xl font-extrabold text-slate-900">Gerenciar Consultas</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Agende e gerencie todas as consultas da clínica</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
           className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl text-sm font-bold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/25 flex-shrink-0"
         >
           <Plus className="w-4 h-4" />
-          Add Appointment
+          Adicionar Consulta
         </button>
       </div>
 
@@ -248,7 +264,7 @@ export default function ManageAppointmentsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search by patient, doctor..."
+            placeholder="Buscar por paciente, médico..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 h-10 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
@@ -261,7 +277,7 @@ export default function ManageAppointmentsPage() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="pl-10 pr-8 h-10 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer"
           >
-            <option value="all">All Status</option>
+            <option value="all">Todos os Status</option>
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
@@ -273,12 +289,12 @@ export default function ManageAppointmentsPage() {
       {loading ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
           <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4 animate-pulse" />
-          <p className="text-slate-400 text-sm">Loading appointments...</p>
+          <p className="text-slate-400 text-sm">Carregando consultas...</p>
         </div>
       ) : filteredAppointments.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
           <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-400 text-sm">No appointments found</p>
+          <p className="text-slate-400 text-sm">Nenhuma consulta encontrada</p>
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm">
@@ -286,12 +302,12 @@ export default function ManageAppointmentsPage() {
             <table className="w-full">
               <thead className="bg-slate-50/80 border-b border-slate-100">
                 <tr>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Patient</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Doctor</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Date &amp; Time</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Type</th>
+                  <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Paciente</th>
+                  <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Médico</th>
+                  <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Data e Hora</th>
+                  <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tipo</th>
                   <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3.5 text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider">Actions</th>
+                  <th className="px-4 py-3.5 text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -306,7 +322,7 @@ export default function ManageAppointmentsPage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-foreground">
-                            {apt.patient?.name || "Unknown"}
+                            {apt.patient?.name || "Desconhecido"}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {apt.patient?.email || "-"}
@@ -323,7 +339,7 @@ export default function ManageAppointmentsPage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-foreground">
-                            {apt.doctor?.name || "Unknown"}
+                            {apt.doctor?.name || "Desconhecido"}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {apt.doctor?.specialization || "-"}
@@ -334,7 +350,7 @@ export default function ManageAppointmentsPage() {
                     <td className="px-4 py-3">
                       <div className="text-sm">
                         <p className="text-foreground font-medium">
-                          {new Date(apt.date).toLocaleDateString("en-US", {
+                          {new Date(apt.date).toLocaleDateString("pt-BR", {
                             month: "short",
                             day: "numeric",
                             year: "numeric",
@@ -344,8 +360,8 @@ export default function ManageAppointmentsPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-sm text-foreground capitalize">
-                        {apt.type.replace("-", " ")}
+                      <span className="text-sm text-foreground">
+                        {TYPE_LABELS[apt.type] || apt.type}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -353,7 +369,7 @@ export default function ManageAppointmentsPage() {
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${STATUS_STYLES[apt.status]}`}
                       >
                         {STATUS_ICONS[apt.status]}
-                        {apt.status.replace("-", " ")}
+                        {STATUS_LABELS[apt.status] || apt.status}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -361,14 +377,14 @@ export default function ManageAppointmentsPage() {
                         <button
                           onClick={() => handleViewDetails(apt)}
                           className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-med"
-                          title="View Details"
+                          title="Ver Detalhes"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleOpenModal(apt)}
                           className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600 transition-med"
-                          title="Edit"
+                          title="Editar"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
@@ -391,7 +407,7 @@ export default function ManageAppointmentsPage() {
                                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 hover:bg-emerald-50"
                                   >
                                     <CheckCircle className="w-3.5 h-3.5" />
-                                    Mark Completed
+                                    Marcar Concluída
                                   </button>
                                 )}
                                 {apt.status !== "cancelled" && (
@@ -403,7 +419,7 @@ export default function ManageAppointmentsPage() {
                                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
                                   >
                                     <XCircle className="w-3.5 h-3.5" />
-                                    Cancel
+                                    Cancelar
                                   </button>
                                 )}
                                 <button
@@ -414,7 +430,7 @@ export default function ManageAppointmentsPage() {
                                   className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 border-t border-border"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
-                                  Delete
+                                  Excluir
                                 </button>
                               </div>
                             </div>
@@ -438,14 +454,14 @@ export default function ManageAppointmentsPage() {
               <h2 className="text-[15px] font-bold text-white">
                 <div className="flex items-center gap-2">
                   {selectedAppointment ? <Edit className="w-5 h-5 text-white" /> : <Plus className="w-5 h-5 text-white" />}
-                  {selectedAppointment ? "Edit Appointment" : "New Appointment"}
+                  {selectedAppointment ? "Editar Consulta" : "Nova Consulta"}
                 </div>
               </h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Patient
+                  Paciente
                 </label>
                 <select
                   value={formData.patientId}
@@ -453,15 +469,14 @@ export default function ManageAppointmentsPage() {
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                   required
                 >
-                  <option value="">Select Patient</option>
-                  {/* Patients would be fetched from API - placeholder for now */}
-                  <option value="placeholder">Patient (integrated with patient list)</option>
+                  <option value="">Selecionar Paciente</option>
+                  <option value="placeholder">Paciente (integrado com a lista de pacientes)</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Doctor
+                  Médico
                 </label>
                 <select
                   value={formData.doctorId}
@@ -469,7 +484,7 @@ export default function ManageAppointmentsPage() {
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                   required
                 >
-                  <option value="">Select Doctor</option>
+                  <option value="">Selecionar Médico</option>
                   {doctors.map((doc) => (
                     <option key={doc._id} value={doc._id}>
                       {doc.name} - {doc.specialization}
@@ -481,7 +496,7 @@ export default function ManageAppointmentsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">
-                    Date
+                    Data
                   </label>
                   <input
                     type="date"
@@ -493,7 +508,7 @@ export default function ManageAppointmentsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">
-                    Time
+                    Hora
                   </label>
                   <input
                     type="time"
@@ -508,7 +523,7 @@ export default function ManageAppointmentsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">
-                    Type
+                    Tipo
                   </label>
                   <select
                     value={formData.type}
@@ -546,14 +561,14 @@ export default function ManageAppointmentsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Notes
+                  Notas
                 </label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
-                  placeholder="Additional notes..."
+                  placeholder="Notas adicionais..."
                 />
               </div>
 
@@ -563,13 +578,13 @@ export default function ManageAppointmentsPage() {
                   onClick={handleCloseModal}
                   className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all duration-200"
                 >
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md"
                 >
-                  {selectedAppointment ? "Update" : "Create"} Appointment
+                  {selectedAppointment ? "Atualizar" : "Criar"} Consulta
                 </button>
               </div>
             </form>
@@ -582,7 +597,7 @@ export default function ManageAppointmentsPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-border flex items-center justify-between">
-              <h2 className="text-lg font-bold text-foreground">Appointment Details</h2>
+              <h2 className="text-lg font-bold text-foreground">Detalhes da Consulta</h2>
               <button
                 onClick={() => setShowDetailsModal(false)}
                 className="p-1.5 rounded-lg hover:bg-muted transition-med"
@@ -599,7 +614,7 @@ export default function ManageAppointmentsPage() {
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-foreground">
-                    {selectedAppointment.patient?.name || "Unknown Patient"}
+                    {selectedAppointment.patient?.name || "Paciente Desconhecido"}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {selectedAppointment.patient?.email || "-"}
@@ -609,7 +624,7 @@ export default function ManageAppointmentsPage() {
                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${STATUS_STYLES[selectedAppointment.status]}`}
                 >
                   {STATUS_ICONS[selectedAppointment.status]}
-                  {selectedAppointment.status}
+                  {STATUS_LABELS[selectedAppointment.status] || selectedAppointment.status}
                 </span>
               </div>
 
@@ -617,10 +632,10 @@ export default function ManageAppointmentsPage() {
                 <div className="p-4 rounded-xl border border-border">
                   <div className="flex items-center gap-2 text-muted-foreground mb-2">
                     <Stethoscope className="w-4 h-4" />
-                    <span className="text-xs">Doctor</span>
+                    <span className="text-xs">Médico</span>
                   </div>
                   <p className="font-medium text-foreground">
-                    {selectedAppointment.doctor?.name || "Unknown"}
+                    {selectedAppointment.doctor?.name || "Desconhecido"}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {selectedAppointment.doctor?.specialization || "-"}
@@ -630,10 +645,10 @@ export default function ManageAppointmentsPage() {
                 <div className="p-4 rounded-xl border border-border">
                   <div className="flex items-center gap-2 text-muted-foreground mb-2">
                     <Calendar className="w-4 h-4" />
-                    <span className="text-xs">Date & Time</span>
+                    <span className="text-xs">Data e Hora</span>
                   </div>
                   <p className="font-medium text-foreground">
-                    {new Date(selectedAppointment.date).toLocaleDateString("en-US", {
+                    {new Date(selectedAppointment.date).toLocaleDateString("pt-BR", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
@@ -646,10 +661,10 @@ export default function ManageAppointmentsPage() {
               <div className="p-4 rounded-xl border border-border">
                 <div className="flex items-center gap-2 text-muted-foreground mb-2">
                   <Clock className="w-4 h-4" />
-                  <span className="text-xs">Type</span>
+                  <span className="text-xs">Tipo</span>
                 </div>
                 <p className="font-medium text-foreground capitalize">
-                  {selectedAppointment.type.replace("-", " ")}
+                  {TYPE_LABELS[selectedAppointment.type] || selectedAppointment.type}
                 </p>
               </div>
 
@@ -657,7 +672,7 @@ export default function ManageAppointmentsPage() {
                 <div className="p-4 rounded-xl border border-border">
                   <div className="flex items-center gap-2 text-muted-foreground mb-2">
                     <AlertCircle className="w-4 h-4" />
-                    <span className="text-xs">Notes</span>
+                    <span className="text-xs">Notas</span>
                   </div>
                   <p className="text-sm text-foreground">{selectedAppointment.notes}</p>
                 </div>
@@ -667,7 +682,7 @@ export default function ManageAppointmentsPage() {
                 <div className="p-4 rounded-xl border border-border">
                   <div className="flex items-center gap-2 text-muted-foreground mb-2">
                     <Phone className="w-4 h-4" />
-                    <span className="text-xs">Contact</span>
+                    <span className="text-xs">Contato</span>
                   </div>
                   <p className="text-sm text-foreground">{selectedAppointment.patient.phone}</p>
                 </div>
@@ -681,13 +696,13 @@ export default function ManageAppointmentsPage() {
                   }}
                   className="flex-1 px-4 py-2.5 rounded-lg bg-amber-50 text-amber-700 text-sm font-semibold hover:bg-amber-100 transition-med"
                 >
-                  Edit
+                  Editar
                 </button>
                 <button
                   onClick={() => setShowDetailsModal(false)}
                   className="flex-1 px-4 py-2.5 rounded-lg border border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition-med"
                 >
-                  Close
+                  Fechar
                 </button>
               </div>
             </div>

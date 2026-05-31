@@ -28,6 +28,15 @@ interface PatientHistory {
   totalVisits: number;
 }
 
+const STATUS_TRANSLATION: Record<string, string> = {
+  pending: "Pendente",
+  confirmed: "Confirmada",
+  "in-progress": "Em Atendimento",
+  completed: "Concluída",
+  cancelled: "Cancelada",
+  no_show: "Não Compareceu",
+};
+
 export default function DoctorHistoryPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +67,7 @@ export default function DoctorHistoryPage() {
       const patientId = appt.patientId?._id || "unknown";
       if (!acc[patientId]) {
         acc[patientId] = {
-          patient: appt.patientId || { _id: patientId, name: "Unknown", email: "" },
+          patient: appt.patientId || { _id: patientId, name: "Desconhecido", email: "" },
           appointments: [],
           lastVisit: "",
           totalVisits: 0,
@@ -101,8 +110,8 @@ export default function DoctorHistoryPage() {
     <DashboardLayout requiredRole="doctor">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">Medical History</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">View patient medical history and past visits</p>
+          <h1 className="text-xl font-bold text-foreground">Histórico Médico</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Visualize o histórico médico dos pacientes e visitas anteriores</p>
         </div>
         <button
           onClick={fetchAppointments}
@@ -110,7 +119,7 @@ export default function DoctorHistoryPage() {
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-med disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh
+          Atualizar
         </button>
       </div>
 
@@ -119,7 +128,7 @@ export default function DoctorHistoryPage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Total Patients</p>
+              <p className="text-xs text-muted-foreground">Total de Pacientes</p>
               <p className="text-2xl font-bold text-foreground">{stats.totalPatients}</p>
             </div>
             <User className="w-8 h-8 text-blue-600 opacity-20" />
@@ -128,7 +137,7 @@ export default function DoctorHistoryPage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">This Month</p>
+              <p className="text-xs text-muted-foreground">Este Mês</p>
               <p className="text-2xl font-bold text-blue-600">{stats.thisMonth}</p>
             </div>
             <Calendar className="w-8 h-8 text-blue-600 opacity-20" />
@@ -137,7 +146,7 @@ export default function DoctorHistoryPage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Total Visits</p>
+              <p className="text-xs text-muted-foreground">Total de Visitas</p>
               <p className="text-2xl font-bold text-purple-600">{stats.totalVisits}</p>
             </div>
             <FileText className="w-8 h-8 text-purple-600 opacity-20" />
@@ -146,7 +155,7 @@ export default function DoctorHistoryPage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Completed</p>
+              <p className="text-xs text-muted-foreground">Concluídas</p>
               <p className="text-2xl font-bold text-emerald-600">{stats.completedVisits}</p>
             </div>
             <Heart className="w-8 h-8 text-emerald-600 opacity-20" />
@@ -158,12 +167,12 @@ export default function DoctorHistoryPage() {
         {/* Patient List */}
         <div className="lg:col-span-1 med-card overflow-hidden">
           <div className="px-5 py-4 border-b border-border">
-            <h3 className="font-semibold text-foreground mb-3">Patients</h3>
+            <h3 className="font-semibold text-foreground mb-3">Pacientes</h3>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search patients..."
+                placeholder="Buscar pacientes..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
@@ -173,12 +182,12 @@ export default function DoctorHistoryPage() {
           {loading ? (
             <div className="p-12 text-center">
               <RefreshCw className="w-8 h-8 text-muted-foreground/30 mx-auto mb-4 animate-spin" />
-              <p className="text-muted-foreground">Loading patients...</p>
+              <p className="text-muted-foreground">Carregando pacientes...</p>
             </div>
           ) : filteredHistory.length === 0 ? (
             <div className="p-12 text-center">
               <User className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-              <p className="text-muted-foreground">No patients found</p>
+              <p className="text-muted-foreground">Nenhum paciente encontrado</p>
             </div>
           ) : (
             <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
@@ -195,9 +204,9 @@ export default function DoctorHistoryPage() {
                       {h.patient.name?.split(" ").map((n) => n[0]).join("").slice(0, 2) || "P"}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">{h.patient.name || "Unknown"}</p>
+                      <p className="font-medium text-foreground truncate">{h.patient.name || "Desconhecido"}</p>
                       <p className="text-xs text-muted-foreground">
-                        {h.totalVisits} visit{h.totalVisits !== 1 ? "s" : ""} • Last: {h.lastVisit ? new Date(h.lastVisit).toLocaleDateString() : "N/A"}
+                        {h.totalVisits} consulta{h.totalVisits !== 1 ? "s" : ""} • Última: {h.lastVisit ? new Date(h.lastVisit).toLocaleDateString("pt-BR") : "N/A"}
                       </p>
                     </div>
                   </div>
@@ -219,15 +228,15 @@ export default function DoctorHistoryPage() {
                   <div>
                     <h3 className="font-semibold text-foreground">{selectedPatientData.patient.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {selectedPatientData.patient.email} • {selectedPatientData.totalVisits} total visits
+                      {selectedPatientData.patient.email} • {selectedPatientData.totalVisits} consultas no total
                     </p>
                   </div>
                 </div>
               </div>
               <div className="p-5">
-                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Visit History</h4>
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Histórico de Visitas</h4>
                 {selectedPatientData.appointments.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No appointment history</p>
+                  <p className="text-muted-foreground text-center py-8">Nenhum histórico de consultas</p>
                 ) : (
                   <div className="space-y-3">
                     {selectedPatientData.appointments
@@ -246,15 +255,15 @@ export default function DoctorHistoryPage() {
                           </div>
                           <div className="flex-1">
                             <p className="text-sm font-medium text-foreground">
-                              {appt.reason || "Appointment"}
+                              {appt.reason || "Consulta"}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {appt.date ? new Date(appt.date).toLocaleDateString("en-US", { 
+                              {appt.date ? new Date(appt.date).toLocaleDateString("pt-BR", { 
                                 weekday: "short", 
                                 month: "short", 
                                 day: "numeric",
                                 year: "numeric"
-                              }) : "No date"} • {appt.timeSlot || "No time"}
+                              }) : "Sem data"} • {appt.timeSlot || "Sem horário"}
                             </p>
                           </div>
                           <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
@@ -262,7 +271,7 @@ export default function DoctorHistoryPage() {
                             appt.status === "cancelled" ? "bg-red-100 text-red-700" :
                             "bg-blue-100 text-blue-700"
                           }`}>
-                            {appt.status}
+                            {STATUS_TRANSLATION[appt.status] || appt.status}
                           </span>
                         </div>
                       ))}
@@ -274,7 +283,7 @@ export default function DoctorHistoryPage() {
             <div className="h-full flex items-center justify-center p-12">
               <div className="text-center">
                 <Heart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                <p className="text-muted-foreground">Select a patient to view their medical history</p>
+                <p className="text-muted-foreground">Selecione um paciente para visualizar seu histórico médico</p>
               </div>
             </div>
           )}

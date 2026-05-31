@@ -35,44 +35,44 @@ type NavItem = {
 const NAV_ITEMS: Record<UserRole, NavItem[]> = {
   admin: [
     { label: "Dashboard", href: "/admin", icon: <LayoutDashboard className="w-[18px] h-[18px]" /> },
-    { label: "Users", href: "/admin/users", icon: <Users className="w-[18px] h-[18px]" /> },
-    { label: "Doctors", href: "/admin/doctors", icon: <Stethoscope className="w-[18px] h-[18px]" /> },
-    { label: "Appointments", href: "/admin/appointments", icon: <Calendar className="w-[18px] h-[18px]" /> },
-    { label: "Analytics", href: "/admin/analytics", icon: <BarChart3 className="w-[18px] h-[18px]" /> },
-    { label: "Reports", href: "/admin/reports", icon: <FileText className="w-[18px] h-[18px]" /> },
-    { label: "AI Assistant", href: "/chatbot", icon: <Bot className="w-[18px] h-[18px]" />, badge: "AI" },
-    { label: "Settings", href: "/admin/settings", icon: <Settings className="w-[18px] h-[18px]" /> },
+    { label: "Usuários", href: "/admin/users", icon: <Users className="w-[18px] h-[18px]" /> },
+    { label: "Médicos", href: "/admin/doctors", icon: <Stethoscope className="w-[18px] h-[18px]" /> },
+    { label: "Consultas", href: "/admin/appointments", icon: <Calendar className="w-[18px] h-[18px]" /> },
+    { label: "Métricas", href: "/admin/analytics", icon: <BarChart3 className="w-[18px] h-[18px]" /> },
+    { label: "Relatórios", href: "/admin/reports", icon: <FileText className="w-[18px] h-[18px]" /> },
+    { label: "Assistente IA", href: "/chatbot", icon: <Bot className="w-[18px] h-[18px]" />, badge: "IA" },
+    { label: "Configurações", href: "/admin/settings", icon: <Settings className="w-[18px] h-[18px]" /> },
   ],
   doctor: [
     { label: "Dashboard", href: "/doctor", icon: <LayoutDashboard className="w-[18px] h-[18px]" /> },
-    { label: "Patient Queue", href: "/doctor/queue", icon: <ListTodo className="w-[18px] h-[18px]" /> },
-    { label: "Medical History", href: "/doctor/history", icon: <Heart className="w-[18px] h-[18px]" /> },
-    { label: "Prescriptions", href: "/doctor/prescription", icon: <ClipboardList className="w-[18px] h-[18px]" /> },
-    { label: "AI Symptom Check", href: "/doctor/ai", icon: <Bot className="w-[18px] h-[18px]" />, badge: "AI" },
-    { label: "Schedule", href: "/doctor/schedule", icon: <Calendar className="w-[18px] h-[18px]" /> },
+    { label: "Fila de Pacientes", href: "/doctor/queue", icon: <ListTodo className="w-[18px] h-[18px]" /> },
+    { label: "Histórico Médico", href: "/doctor/history", icon: <Heart className="w-[18px] h-[18px]" /> },
+    { label: "Prescrições", href: "/doctor/prescription", icon: <ClipboardList className="w-[18px] h-[18px]" /> },
+    { label: "Diagnóstico IA", href: "/doctor/ai", icon: <Bot className="w-[18px] h-[18px]" />, badge: "IA" },
+    { label: "Agenda", href: "/doctor/schedule", icon: <Calendar className="w-[18px] h-[18px]" /> },
   ],
   receptionist: [
     { label: "Dashboard", href: "/receptionist", icon: <LayoutDashboard className="w-[18px] h-[18px]" /> },
-    { label: "Book Appointment", href: "/receptionist/book-appointment", icon: <CalendarPlus className="w-[18px] h-[18px]" /> },
-    { label: "Appointments", href: "/receptionist/appointments", icon: <Calendar className="w-[18px] h-[18px]" /> },
-    { label: "Register Patient", href: "/receptionist/register-patient", icon: <UserPlus className="w-[18px] h-[18px]" /> },
-    { label: "Queue", href: "/receptionist/queue", icon: <ListTodo className="w-[18px] h-[18px]" /> },
-    { label: "AI Assistant", href: "/chatbot", icon: <Bot className="w-[18px] h-[18px]" />, badge: "AI" },
+    { label: "Agendar Consulta", href: "/receptionist/book-appointment", icon: <CalendarPlus className="w-[18px] h-[18px]" /> },
+    { label: "Consultas", href: "/receptionist/appointments", icon: <Calendar className="w-[18px] h-[18px]" /> },
+    { label: "Cadastrar Paciente", href: "/receptionist/register-patient", icon: <UserPlus className="w-[18px] h-[18px]" /> },
+    { label: "Fila de Espera", href: "/receptionist/queue", icon: <ListTodo className="w-[18px] h-[18px]" /> },
+    { label: "Assistente IA", href: "/chatbot", icon: <Bot className="w-[18px] h-[18px]" />, badge: "IA" },
   ],
   patient: [
     { label: "Dashboard", href: "/patient", icon: <LayoutDashboard className="w-[18px] h-[18px]" /> },
-    { label: "My Appointments", href: "/patient/appointments", icon: <Calendar className="w-[18px] h-[18px]" /> },
-    { label: "Prescriptions", href: "/patient/prescriptions", icon: <FileText className="w-[18px] h-[18px]" /> },
-    { label: "Medical History", href: "/patient/history", icon: <Heart className="w-[18px] h-[18px]" /> },
-    { label: "AI Assistant", href: "/chatbot", icon: <Bot className="w-[18px] h-[18px]" />, badge: "AI" },
+    { label: "Minhas Consultas", href: "/patient/appointments", icon: <Calendar className="w-[18px] h-[18px]" /> },
+    { label: "Minhas Receitas", href: "/patient/prescriptions", icon: <FileText className="w-[18px] h-[18px]" /> },
+    { label: "Histórico Médico", href: "/patient/history", icon: <Heart className="w-[18px] h-[18px]" /> },
+    { label: "Assistente IA", href: "/chatbot", icon: <Bot className="w-[18px] h-[18px]" />, badge: "IA" },
   ],
 };
 
 const ROLE_META: Record<UserRole, { label: string; bg: string; text: string; lightBg: string }> = {
-  admin: { label: "Administrator", bg: "bg-slate-900", text: "text-white", lightBg: "bg-slate-100 text-slate-700" },
-  doctor: { label: "Doctor", bg: "bg-blue-600", text: "text-white", lightBg: "bg-blue-50 text-blue-700" },
-  receptionist: { label: "Receptionist", bg: "bg-slate-800", text: "text-white", lightBg: "bg-slate-100 text-slate-700" },
-  patient: { label: "Patient", bg: "bg-emerald-600", text: "text-white", lightBg: "bg-emerald-50 text-emerald-700" },
+  admin: { label: "Administrador", bg: "bg-slate-900", text: "text-white", lightBg: "bg-slate-100 text-slate-700" },
+  doctor: { label: "Médico", bg: "bg-blue-600", text: "text-white", lightBg: "bg-blue-50 text-blue-700" },
+  receptionist: { label: "Recepcionista", bg: "bg-slate-800", text: "text-white", lightBg: "bg-slate-100 text-slate-700" },
+  patient: { label: "Paciente", bg: "bg-emerald-600", text: "text-white", lightBg: "bg-emerald-50 text-emerald-700" },
 };
 
 interface SidebarProps {
@@ -134,7 +134,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               Health<span className="text-blue-600">Care</span>
               <span className="text-slate-400 font-light"> MS</span>
             </span>
-            <p className="text-[10px] text-slate-400 font-medium -mt-0.5">Medical Management System</p>
+            <p className="text-[10px] text-slate-400 font-medium -mt-0.5">Sistema de Gestão Médica</p>
           </div>
         )}
 
@@ -143,7 +143,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <button
             onClick={() => setCollapsed(true)}
             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200"
-            aria-label="Collapse sidebar"
+            aria-label="Recolher barra lateral"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -221,7 +221,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {!collapsed && (
             <button
               onClick={handleLogout}
-              title="Sign out"
+              title="Sair"
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors flex-shrink-0"
             >
               <LogOut className="w-4 h-4" />

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../DashboardLayout";
-import { Users, Plus, Search, Edit, Trash2, UserPlus, Mail, Phone, Shield } from "lucide-react";
+import { Users, Plus, Search, Edit, Trash2, UserPlus, Mail, Phone, Shield, X } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "../../../components/ui/Toast";
 
@@ -78,7 +78,7 @@ export default function ManageUsersPage() {
     e.preventDefault();
 
     if (!formData.name || !formData.email || (!editingUser && !formData.password)) {
-      error("Validation Error", "Please fill all required fields");
+      error("Erro de Validação", "Por favor, preencha todos os campos obrigatórios");
       return;
     }
 
@@ -93,7 +93,7 @@ export default function ManageUsersPage() {
             phone: formData.phone,
           }),
         });
-        success("Success", "User updated successfully");
+        success("Sucesso", "Usuário atualizado com sucesso");
       } else {
         // Create user based on role
         const endpoint = formData.role === "doctor"
@@ -113,7 +113,7 @@ export default function ManageUsersPage() {
             specialization: formData.specialization,
           }),
         });
-        success("Success", "User created successfully");
+        success("Sucesso", "Usuário criado com sucesso");
       }
 
       setShowModal(false);
@@ -121,7 +121,7 @@ export default function ManageUsersPage() {
       setFormData({ name: "", email: "", password: "", role: "patient", phone: "", specialization: "" });
       fetchUsers();
     } catch (err: any) {
-      error("Error", err.message || "Operation failed");
+      error("Erro", err.message || "A operação falhou");
     }
   };
 
@@ -139,16 +139,16 @@ export default function ManageUsersPage() {
   };
 
   const handleDelete = async (userId: string) => {
-    if (!confirm("Are you sure you want to deactivate this user?")) return;
+    if (!confirm("Tem certeza de que deseja desativar este usuário?")) return;
 
     try {
       await apiFetch(`/api/users/${userId}`, {
         method: "DELETE",
       });
-      success("Success", "User deactivated successfully");
+      success("Sucesso", "Usuário desativado com sucesso");
       fetchUsers();
     } catch (err: any) {
-      error("Error", err.message || "Failed to delete user");
+      error("Erro", err.message || "Falha ao desativar usuário");
     }
   };
 
@@ -166,8 +166,8 @@ export default function ManageUsersPage() {
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Admin</p>
-          <h1 className="text-xl font-extrabold text-slate-900">Manage Users</h1>
-          <p className="text-xs text-slate-500 mt-0.5">View and manage all system users</p>
+          <h1 className="text-xl font-extrabold text-slate-900">Gerenciar Usuários</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Visualize e gerencie todos os usuários do sistema</p>
         </div>
         <button
           onClick={() => {
@@ -178,7 +178,7 @@ export default function ManageUsersPage() {
           className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl text-sm font-bold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/25 flex-shrink-0"
         >
           <Plus className="w-4 h-4" />
-          Add User
+          Adicionar Usuário
         </button>
       </div>
 
@@ -188,7 +188,7 @@ export default function ManageUsersPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search users..."
+            placeholder="Buscar usuários..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 h-10 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
@@ -204,7 +204,7 @@ export default function ManageUsersPage() {
                 : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                 }`}
             >
-              {role.charAt(0).toUpperCase() + role.slice(1)}
+              {role === "all" ? "Todos" : role === "admin" ? "Admins" : role === "doctor" ? "Médicos" : role === "receptionist" ? "Recepção" : "Pacientes"}
             </button>
           ))}
         </div>
@@ -215,25 +215,25 @@ export default function ManageUsersPage() {
         {loading ? (
           <div className="p-12 text-center">
             <Users className="w-12 h-12 text-slate-300 mx-auto mb-4 animate-pulse" />
-            <p className="text-slate-400 text-sm">Loading users...</p>
+            <p className="text-slate-400 text-sm">Carregando usuários...</p>
           </div>
         ) : filteredUsers.length === 0 ? (
           <div className="p-12 text-center">
             <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-400 text-sm">No users found</p>
+            <p className="text-slate-400 text-sm">Nenhum usuário encontrado</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-50/80 border-b border-slate-100">
                 <tr>
-                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5">User</th>
-                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5">Role</th>
-                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5 hidden md:table-cell">Contact</th>
-                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5 hidden lg:table-cell">Specialization</th>
-                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5 hidden lg:table-cell">Joined</th>
+                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5">Usuário</th>
+                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5">Função</th>
+                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5 hidden md:table-cell">Contato</th>
+                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5 hidden lg:table-cell">Especialidade</th>
+                  <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5 hidden lg:table-cell">Data de Cadastro</th>
                   <th className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5">Status</th>
-                  <th className="text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5">Actions</th>
+                  <th className="text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3.5">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -252,7 +252,7 @@ export default function ManageUsersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${ROLE_COLORS[user.role]}`}>
-                        {user.role}
+                        {user.role === "admin" ? "Administrador" : user.role === "doctor" ? "Médico" : user.role === "receptionist" ? "Recepcionista" : "Paciente"}
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
@@ -273,14 +273,14 @@ export default function ManageUsersPage() {
                       {user.specialization || "-"}
                     </td>
                     <td className="px-4 py-3 text-sm text-muted-foreground hidden lg:table-cell">
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      {new Date(user.createdAt).toLocaleDateString("pt-BR")}
                     </td>
                     <td className="px-4 py-3">
                       <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${user.isActive
                         ? "bg-emerald-100 text-emerald-700"
                         : "bg-gray-100 text-gray-700"
                         }`}>
-                        {user.isActive ? "Active" : "Inactive"}
+                        {user.isActive ? "Ativo" : "Inativo"}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -288,14 +288,14 @@ export default function ManageUsersPage() {
                         <button
                           onClick={() => handleEdit(user)}
                           className="p-1.5 rounded-lg hover:bg-blue-100 transition-med text-blue-600"
-                          title="Edit user"
+                          title="Editar usuário"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(user._id)}
                           className="p-1.5 rounded-lg hover:bg-red-100 transition-med text-red-600"
-                          title="Deactivate user"
+                          title="Desativar usuário"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -317,21 +317,21 @@ export default function ManageUsersPage() {
               <h2 className="text-[15px] font-bold text-white">
                 <div className="flex items-center gap-2">
                   {editingUser ? <Edit className="w-5 h-5 text-white" /> : <UserPlus className="w-5 h-5 text-white" />}
-                  {editingUser ? "Edit User" : "Add New User"}
+                  {editingUser ? "Editar Usuário" : "Adicionar Novo Usuário"}
                 </div>
               </h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
               >
-                <Shield className="w-4 h-4 text-white" />
+                <X className="w-4 h-4 text-white" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Full Name *
+                  Nome Completo *
                 </label>
                 <input
                   type="text"
@@ -339,13 +339,13 @@ export default function ManageUsersPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
-                  placeholder="Enter full name"
+                  placeholder="Digite o nome completo"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Email *
+                  E-mail *
                 </label>
                 <input
                   type="email"
@@ -353,14 +353,14 @@ export default function ManageUsersPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
-                  placeholder="email@example.com"
+                  placeholder="email@exemplo.com"
                 />
               </div>
 
               {!editingUser && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">
-                    Password *
+                    Senha *
                   </label>
                   <input
                     type="password"
@@ -368,7 +368,7 @@ export default function ManageUsersPage() {
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
-                    placeholder="Min. 6 characters"
+                    placeholder="Mínimo de 6 caracteres"
                     minLength={6}
                   />
                 </div>
@@ -376,31 +376,31 @@ export default function ManageUsersPage() {
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Phone
+                  Telefone
                 </label>
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+55 (11) 00000-0000"
                 />
               </div>
 
               {!editingUser && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">
-                    Role *
+                    Função *
                   </label>
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
                   >
-                    <option value="patient">Patient</option>
-                    <option value="doctor">Doctor</option>
-                    <option value="receptionist">Receptionist</option>
-                    <option value="admin">Admin</option>
+                    <option value="patient">Paciente</option>
+                    <option value="doctor">Médico</option>
+                    <option value="receptionist">Recepcionista</option>
+                    <option value="admin">Administrador</option>
                   </select>
                 </div>
               )}
@@ -408,14 +408,14 @@ export default function ManageUsersPage() {
               {formData.role === "doctor" && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">
-                    Specialization
+                    Especialidade
                   </label>
                   <input
                     type="text"
                     value={formData.specialization}
                     onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
-                    placeholder="e.g., Cardiology, General Medicine"
+                    placeholder="ex: Cardiologia, Clínica Geral"
                   />
                 </div>
               )}
@@ -426,13 +426,13 @@ export default function ManageUsersPage() {
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all duration-200"
                 >
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md"
                 >
-                  {editingUser ? "Update User" : "Create User"}
+                  {editingUser ? "Atualizar Usuário" : "Criar Usuário"}
                 </button>
               </div>
             </form>

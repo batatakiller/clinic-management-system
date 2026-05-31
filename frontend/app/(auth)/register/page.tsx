@@ -7,10 +7,10 @@ import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle } from "lucide-react";
 import { useAuth, type UserRole } from "../../contexts/AuthContext";
 
 const ROLES: { value: UserRole; label: string; desc: string }[] = [
-    { value: "admin", label: "Administrator", desc: "Manage system & users" },
-    { value: "doctor", label: "Doctor", desc: "Clinical care & patients" },
-    { value: "receptionist", label: "Receptionist", desc: "Bookings & registration" },
-    { value: "patient", label: "Patient", desc: "View records & appointments" },
+    { value: "admin", label: "Administrador", desc: "Gerenciar sistema e usuários" },
+    { value: "doctor", label: "Médico", desc: "Atendimento clínico e pacientes" },
+    { value: "receptionist", label: "Recepcionista", desc: "Agendamentos e cadastros" },
+    { value: "patient", label: "Paciente", desc: "Ver registros e consultas" },
 ];
 
 interface FormData {
@@ -36,10 +36,10 @@ function getPasswordStrength(pwd: string): { score: number; label: string; color
     if (/[^A-Za-z0-9]/.test(pwd)) score++;
     const map = [
         { label: "", color: "bg-slate-200" },
-        { label: "Weak", color: "bg-red-400" },
-        { label: "Fair", color: "bg-amber-400" },
-        { label: "Good", color: "bg-blue-400" },
-        { label: "Strong", color: "bg-emerald-500" },
+        { label: "Fraca", color: "bg-red-400" },
+        { label: "Razoável", color: "bg-amber-400" },
+        { label: "Boa", color: "bg-blue-400" },
+        { label: "Forte", color: "bg-emerald-500" },
     ];
     return { score, ...map[score] };
 }
@@ -71,13 +71,13 @@ export default function RegisterPage() {
 
     const validate = (): boolean => {
         const errors: FieldErrors = {};
-        if (!formData.name.trim()) errors.name = "Full name is required";
-        if (!formData.email) errors.email = "Email is required";
-        else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Invalid email";
-        if (!formData.password) errors.password = "Password is required";
-        else if (formData.password.length < 8) errors.password = "Minimum 8 characters";
+        if (!formData.name.trim()) errors.name = "O nome completo é obrigatório";
+        if (!formData.email) errors.email = "O e-mail é obrigatório";
+        else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "E-mail inválido";
+        if (!formData.password) errors.password = "A senha é obrigatória";
+        else if (formData.password.length < 8) errors.password = "Mínimo de 8 caracteres";
         if (formData.password !== formData.confirmPassword)
-            errors.confirmPassword = "Passwords do not match";
+            errors.confirmPassword = "As senhas não coincidem";
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;
     };
@@ -106,10 +106,10 @@ export default function RegisterPage() {
                 setTimeout(() => router.push("/login"), 2000);
             } else {
                 const err = (await res.json()) as { message?: string };
-                setSubmitError(err.message ?? "Registration failed");
+                setSubmitError(err.message ?? "Falha no cadastro");
             }
         } catch {
-            setSubmitError("Network error. Please try again.");
+            setSubmitError("Erro de rede. Por favor, tente novamente.");
         }
     };
 
@@ -119,8 +119,8 @@ export default function RegisterPage() {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-4">
                     <CheckCircle className="w-8 h-8 text-emerald-600" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground mb-2">Account Created!</h2>
-                <p className="text-muted-foreground text-sm">Redirecting you to login…</p>
+                <h2 className="text-xl font-bold text-foreground mb-2">Conta Criada!</h2>
+                <p className="text-muted-foreground text-sm">Redirecionando você para o login…</p>
             </div>
         );
     }
@@ -128,8 +128,8 @@ export default function RegisterPage() {
     return (
         <div className="w-full max-w-md">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-foreground mb-1">Create an account</h1>
-                <p className="text-muted-foreground text-sm">Join HealthCareMS to get started</p>
+                <h1 className="text-2xl font-bold text-foreground mb-1">Criar uma conta</h1>
+                <p className="text-muted-foreground text-sm">Junte-se ao HealthCare MS para começar</p>
             </div>
 
             {/* API error */}
@@ -144,7 +144,7 @@ export default function RegisterPage() {
                 {/* Full Name */}
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1.5">
-                        Full name
+                        Nome completo
                     </label>
                     <input
                         id="name"
@@ -153,7 +153,7 @@ export default function RegisterPage() {
                         autoComplete="name"
                         value={formData.name}
                         onChange={handleChange}
-                        placeholder="Jane Doe"
+                        placeholder="Ana Silva"
                         className={`w-full h-11 px-4 rounded-lg border bg-white text-sm text-foreground
               placeholder:text-muted-foreground focus:outline-none focus:ring-2
               focus:ring-primary/30 focus:border-primary transition-med
@@ -167,7 +167,7 @@ export default function RegisterPage() {
                 {/* Email */}
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
-                        Email address
+                        Endereço de e-mail
                     </label>
                     <input
                         id="email"
@@ -176,7 +176,7 @@ export default function RegisterPage() {
                         autoComplete="email"
                         value={formData.email}
                         onChange={handleChange}
-                        placeholder="you@clinic.com"
+                        placeholder="voce@clinica.com"
                         className={`w-full h-11 px-4 rounded-lg border bg-white text-sm text-foreground
               placeholder:text-muted-foreground focus:outline-none focus:ring-2
               focus:ring-primary/30 focus:border-primary transition-med
@@ -190,7 +190,7 @@ export default function RegisterPage() {
                 {/* Password */}
                 <div>
                     <label htmlFor="reg-password" className="block text-sm font-medium text-foreground mb-1.5">
-                        Password
+                        Senha
                     </label>
                     <div className="relative">
                         <input
@@ -200,7 +200,7 @@ export default function RegisterPage() {
                             autoComplete="new-password"
                             value={formData.password}
                             onChange={handleChange}
-                            placeholder="Min. 8 characters"
+                            placeholder="Mín. 8 caracteres"
                             className={`w-full h-11 px-4 pr-11 rounded-lg border bg-white text-sm text-foreground
                 placeholder:text-muted-foreground focus:outline-none focus:ring-2
                 focus:ring-primary/30 focus:border-primary transition-med
@@ -211,7 +211,7 @@ export default function RegisterPage() {
                             onClick={() => setShowPwd((v) => !v)}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground
                 hover:text-foreground transition-med p-1"
-                            aria-label="Toggle password"
+                            aria-label="Alternar visibilidade da senha"
                         >
                             {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -238,7 +238,7 @@ export default function RegisterPage() {
                 {/* Confirm Password */}
                 <div>
                     <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-1.5">
-                        Confirm password
+                        Confirmar senha
                     </label>
                     <input
                         id="confirmPassword"
@@ -247,7 +247,7 @@ export default function RegisterPage() {
                         autoComplete="new-password"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        placeholder="Re-enter password"
+                        placeholder="Digite a senha novamente"
                         className={`w-full h-11 px-4 rounded-lg border bg-white text-sm text-foreground
               placeholder:text-muted-foreground focus:outline-none focus:ring-2
               focus:ring-primary/30 focus:border-primary transition-med
@@ -260,7 +260,7 @@ export default function RegisterPage() {
 
                 {/* Role */}
                 <div>
-                    <p className="block text-sm font-medium text-foreground mb-2">Account type</p>
+                    <p className="block text-sm font-medium text-foreground mb-2">Tipo de conta</p>
                     <div className="grid grid-cols-2 gap-2">
                         {ROLES.map((r) => (
                             <label
@@ -298,18 +298,18 @@ export default function RegisterPage() {
                     {isLoading ? (
                         <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            Creating account…
+                            Criando conta…
                         </>
                     ) : (
-                        "Create account"
+                        "Criar conta"
                     )}
                 </button>
             </form>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
-                Already have an account?{" "}
+                Já tem uma conta?{" "}
                 <Link href="/login" className="text-primary font-medium hover:underline">
-                    Sign in
+                    Entrar
                 </Link>
             </p>
         </div>

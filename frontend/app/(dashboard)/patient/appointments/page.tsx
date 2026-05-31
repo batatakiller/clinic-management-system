@@ -42,6 +42,14 @@ const STATUS_COLOR: Record<string, string> = {
   "no-show": "bg-gray-100 text-gray-700",
 };
 
+const STATUS_TRANSLATION: Record<string, string> = {
+  scheduled: "Agendada",
+  confirmed: "Confirmada",
+  completed: "Concluída",
+  cancelled: "Cancelada",
+  "no-show": "Não Compareceu",
+};
+
 function AIModal({
   prescription,
   onClose,
@@ -89,7 +97,7 @@ function AIModal({
       );
       const data = await res.json();
       if (!res.ok) {
-        setErr(data.message ?? data.error ?? "Unknown error");
+        setErr(data.message ?? data.error ?? "Erro desconhecido");
         return;
       }
       setExplanation(data.data?.explanation || data.explanation);
@@ -97,7 +105,7 @@ function AIModal({
       const errorMsg =
         err instanceof Error
           ? err.message
-          : "Could not connect to AI service. Please try again.";
+          : "Não foi possível conectar ao serviço de IA. Por favor, tente novamente.";
       setErr(errorMsg);
     } finally {
       setLoading(false);
@@ -119,10 +127,10 @@ function AIModal({
             </div>
             <div>
               <h3 className="font-semibold text-foreground text-sm">
-                AI Prescription Explainer
+                Explicador de Prescrição por IA
               </h3>
               <p className="text-xs text-muted-foreground">
-                {prescription.doctor?.name || "Doctor"} ·{" "}
+                {prescription.doctor?.name || "Médico"} ·{" "}
                 {new Date(prescription.createdAt).toLocaleDateString()}
               </p>
             </div>
@@ -140,7 +148,7 @@ function AIModal({
             <div className="text-center py-8">
               <HelpCircle className="w-12 h-12 text-purple-300 mx-auto mb-4" />
               <p className="text-sm text-muted-foreground mb-2">
-                Get a simple explanation of your prescription in English or Urdu
+                Obtenha uma explicação simples da sua prescrição em Inglês ou Urdu
               </p>
               <p className="text-xs text-muted-foreground mb-6 font-medium">
                 {prescription.diagnosis}
@@ -166,7 +174,7 @@ function AIModal({
             <div className="flex flex-col items-center gap-3 py-12">
               <Loader2 className="w-10 h-10 text-primary animate-spin" />
               <p className="text-sm text-muted-foreground">
-                AI is generating your explanation…
+                A IA está gerando sua explicação…
               </p>
             </div>
           )}
@@ -181,7 +189,7 @@ function AIModal({
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xs font-medium text-muted-foreground">
-                  Language:
+                  Idioma:
                 </span>
                 <div className="flex gap-1.5">
                   {(["English", "Urdu"] as const).map((l) => (
@@ -293,7 +301,7 @@ export default function PatientAppointmentsPage() {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to download PDF: ${response.status}`);
+        throw new Error(`Falha ao baixar PDF: ${response.status}`);
       }
 
       const blob = await response.blob();
@@ -305,7 +313,7 @@ export default function PatientAppointmentsPage() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       const errorMsg =
-        err instanceof Error ? err.message : "Failed to download PDF";
+        err instanceof Error ? err.message : "Falha ao baixar PDF";
       alert(errorMsg); // Show to user
     }
   };
@@ -317,7 +325,7 @@ export default function PatientAppointmentsPage() {
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">
-              Loading your appointments...
+              Carregando suas consultas...
             </p>
           </div>
         </div>
@@ -335,9 +343,9 @@ export default function PatientAppointmentsPage() {
       )}
 
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-foreground">My Appointments</h1>
+        <h1 className="text-xl font-bold text-foreground">Minhas Consultas</h1>
         <p className="text-xs text-muted-foreground mt-0.5">
-          {upcoming.length} upcoming · {past.length} past
+          {upcoming.length} futuras · {past.length} passadas
         </p>
       </div>
 
@@ -345,7 +353,7 @@ export default function PatientAppointmentsPage() {
       {upcoming.length > 0 && (
         <div className="mb-6">
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">
-            Upcoming
+            Futuras
           </h2>
           <div className="space-y-3">
             {upcoming.map((a) => (
@@ -360,15 +368,15 @@ export default function PatientAppointmentsPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-foreground">
-                        {a.doctor?.name || "Doctor"}
+                        {a.doctor?.name || "Médico"}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {a.doctor?.specialization || "General"} ·{" "}
-                        {a.reason || a.type || "Appointment"}
+                        {a.doctor?.specialization || "Geral"} ·{" "}
+                        {a.reason || a.type || "Consulta"}
                       </p>
                       <p className="text-xs font-medium text-blue-600 mt-1">
-                        {new Date(a.date).toLocaleDateString()} at{" "}
-                        {a.timeSlot || "TBD"}
+                        {new Date(a.date).toLocaleDateString()} às{" "}
+                        {a.timeSlot || "A definir"}
                       </p>
                     </div>
                   </div>
@@ -378,7 +386,7 @@ export default function PatientAppointmentsPage() {
                       STATUS_COLOR.scheduled
                     }`}
                   >
-                    {a.status}
+                    {STATUS_TRANSLATION[a.status?.toLowerCase()] || a.status}
                   </span>
                 </div>
               </div>
@@ -390,7 +398,7 @@ export default function PatientAppointmentsPage() {
       {/* Past */}
       <div className="mb-8">
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">
-          Past Visits
+          Visitas Passadas
         </h2>
         <div className="space-y-3">
           {past.length > 0 ? (
@@ -403,15 +411,15 @@ export default function PatientAppointmentsPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-foreground">
-                        {a.doctor?.name || "Doctor"}
+                        {a.doctor?.name || "Médico"}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {a.doctor?.specialization || "General"} ·{" "}
-                        {a.reason || a.type || "Appointment"}
+                        {a.doctor?.specialization || "Geral"} ·{" "}
+                        {a.reason || a.type || "Consulta"}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(a.date).toLocaleDateString()} at{" "}
-                        {a.timeSlot || "TBD"}
+                        {new Date(a.date).toLocaleDateString()} às{" "}
+                        {a.timeSlot || "A definir"}
                       </p>
                     </div>
                   </div>
@@ -421,7 +429,7 @@ export default function PatientAppointmentsPage() {
                       "bg-gray-100 text-gray-700"
                     }`}
                   >
-                    {a.status}
+                    {STATUS_TRANSLATION[a.status?.toLowerCase()] || a.status}
                   </span>
                 </div>
               </div>
@@ -429,7 +437,7 @@ export default function PatientAppointmentsPage() {
           ) : (
             <div className="med-card p-8 text-center">
               <Calendar className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-              <p className="text-muted-foreground">No past appointments</p>
+              <p className="text-muted-foreground">Nenhuma consulta passada</p>
             </div>
           )}
         </div>
@@ -438,7 +446,7 @@ export default function PatientAppointmentsPage() {
       {/* Prescriptions */}
       <div>
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">
-          My Prescriptions
+          Minhas Prescrições
         </h2>
         {prescriptions.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -453,7 +461,7 @@ export default function PatientAppointmentsPage() {
                   </span>
                 </div>
                 <p className="text-xs font-semibold text-muted-foreground">
-                  {rx.doctor?.name || "Doctor"}
+                  {rx.doctor?.name || "Médico"}
                 </p>
                 <p className="text-sm font-bold text-foreground mt-0.5 mb-3">
                   {rx.diagnosis}
@@ -470,7 +478,7 @@ export default function PatientAppointmentsPage() {
                   ))}
                   {rx.medicines.length > 3 && (
                     <p className="text-xs text-muted-foreground">
-                      +{rx.medicines.length - 3} more medicines
+                      +{rx.medicines.length - 3} mais medicamentos
                     </p>
                   )}
                 </div>
@@ -479,13 +487,13 @@ export default function PatientAppointmentsPage() {
                     onClick={() => setActiveModal(rx)}
                     className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-purple-50 text-purple-700 text-xs font-medium hover:bg-purple-100 transition-med border border-purple-100"
                   >
-                    <HelpCircle className="w-3.5 h-3.5" /> Explain
+                    <HelpCircle className="w-3.5 h-3.5" /> Explicar
                   </button>
                   <button
                     onClick={() => downloadPDF(rx)}
                     className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-med border border-primary/10"
                   >
-                    <Download className="w-3.5 h-3.5" /> Download
+                    <Download className="w-3.5 h-3.5" /> Baixar
                   </button>
                 </div>
               </div>
@@ -494,7 +502,7 @@ export default function PatientAppointmentsPage() {
         ) : (
           <div className="med-card p-8 text-center">
             <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-muted-foreground">No prescriptions yet</p>
+            <p className="text-muted-foreground">Nenhuma prescrição ainda</p>
           </div>
         )}
       </div>

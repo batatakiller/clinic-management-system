@@ -39,6 +39,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
+  console.log("apiFetch requesting:", url);
   const response = await fetch(url, {
     ...options,
     headers,

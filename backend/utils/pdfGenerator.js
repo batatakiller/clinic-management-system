@@ -15,9 +15,9 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
                 size: 'A4',
                 margin: 50,
                 info: {
-                    Title: `Prescription - ${patient.name}`,
+                    Title: `Prescrição - ${patient.name}`,
                     Author: doctor.name,
-                    Subject: 'Medical Prescription',
+                    Subject: 'Prescrição Médica',
                 },
             });
 
@@ -31,13 +31,13 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
                 .fontSize(24)
                 .font('Helvetica-Bold')
                 .fillColor('#1a73e8')
-                .text('HealthCare Management System', { align: 'center' });
+                .text('Sistema de Gestão de Saúde', { align: 'center' });
 
             doc
                 .fontSize(11)
                 .font('Helvetica')
                 .fillColor('#555')
-                .text('Advanced Medical Care & Diagnosis', { align: 'center' });
+                .text('Cuidados Médicos Avançados & Diagnóstico', { align: 'center' });
 
             doc.moveDown(0.3);
             doc
@@ -51,16 +51,16 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
 
             // ─── DOCTOR INFO ─────────────────────────────────────────────────────
             doc.fontSize(11).font('Helvetica-Bold').fillColor('#333');
-            doc.text(`Dr. ${doctor.name}`, { continued: false });
+            doc.text(`Dr(a). ${doctor.name}`, { continued: false });
             doc
                 .font('Helvetica')
                 .fillColor('#555')
                 .fontSize(10)
-                .text(`Specialization: ${doctor.specialization || 'General Physician'}`);
+                .text(`Especialidade: ${doctor.specialization || 'Clínico Geral'}`);
             if (doctor.licenseNumber) {
-                doc.text(`License No: ${doctor.licenseNumber}`);
+                doc.text(`CRM: ${doctor.licenseNumber}`);
             }
-            doc.text(`Contact: ${doctor.phone || 'N/A'}`);
+            doc.text(`Contato: ${doctor.phone || 'N/A'}`);
 
             // ─── HORIZONTAL DIVIDER ──────────────────────────────────────────────
             doc.moveDown(0.8);
@@ -68,21 +68,21 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
             doc.moveDown(0.8);
 
             // ─── PATIENT INFO ─────────────────────────────────────────────────────
-            doc.fontSize(12).font('Helvetica-Bold').fillColor('#1a73e8').text('Patient Information');
+            doc.fontSize(12).font('Helvetica-Bold').fillColor('#1a73e8').text('Informações do Paciente');
             doc.moveDown(0.4);
 
             const patientInfoY = doc.y;
             doc.fontSize(10).font('Helvetica').fillColor('#333');
-            doc.text(`Name: ${patient.name}`, { continued: false });
-            doc.text(`Email: ${patient.email}`);
-            doc.text(`Phone: ${patient.phone || 'N/A'}`);
+            doc.text(`Nome: ${patient.name}`, { continued: false });
+            doc.text(`E-mail: ${patient.email}`);
+            doc.text(`Telefone: ${patient.phone || 'N/A'}`);
 
             doc
                 .fontSize(10)
                 .font('Helvetica')
                 .fillColor('#333')
                 .text(
-                    `Date: ${new Date(prescription.createdAt).toLocaleDateString('en-PK', {
+                    `Data: ${new Date(prescription.createdAt).toLocaleDateString('pt-BR', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -94,7 +94,7 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
             doc.moveDown(0.8);
 
             // ─── DIAGNOSIS ───────────────────────────────────────────────────────
-            doc.fontSize(12).font('Helvetica-Bold').fillColor('#1a73e8').text('Diagnosis');
+            doc.fontSize(12).font('Helvetica-Bold').fillColor('#1a73e8').text('Diagnóstico');
             doc.moveDown(0.3);
             doc
                 .fontSize(10)
@@ -105,7 +105,7 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
             doc.moveDown(1);
 
             // ─── MEDICINES TABLE ──────────────────────────────────────────────────
-            doc.fontSize(12).font('Helvetica-Bold').fillColor('#1a73e8').text('Prescribed Medicines');
+            doc.fontSize(12).font('Helvetica-Bold').fillColor('#1a73e8').text('Medicamentos Prescritos');
             doc.moveDown(0.5);
 
             // Table header background
@@ -115,10 +115,10 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
             doc.rect(50, tableTop, 495, 20).fill('#1a73e8');
             doc.fontSize(9).font('Helvetica-Bold').fillColor('#fff');
             doc.text('#', colX.no, tableTop + 6, { width: 20, align: 'center' });
-            doc.text('Medicine', colX.name, tableTop + 6, { width: 140 });
-            doc.text('Dosage', colX.dosage, tableTop + 6, { width: 95 });
-            doc.text('Frequency', colX.frequency, tableTop + 6, { width: 95 });
-            doc.text('Duration', colX.duration, tableTop + 6, { width: 75 });
+            doc.text('Medicamento', colX.name, tableTop + 6, { width: 140 });
+            doc.text('Dosagem', colX.dosage, tableTop + 6, { width: 95 });
+            doc.text('Frequência', colX.frequency, tableTop + 6, { width: 95 });
+            doc.text('Duração', colX.duration, tableTop + 6, { width: 75 });
 
             let rowY = tableTop + 22;
             prescription.medicines.forEach((med, idx) => {
@@ -151,7 +151,7 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
             // ─── GENERAL INSTRUCTIONS ─────────────────────────────────────────────
             if (prescription.generalInstructions) {
                 doc.moveDown(0.8);
-                doc.fontSize(12).font('Helvetica-Bold').fillColor('#1a73e8').text('General Instructions');
+                doc.fontSize(12).font('Helvetica-Bold').fillColor('#1a73e8').text('Instruções Gerais');
                 doc.moveDown(0.3);
                 doc
                     .fontSize(10)
@@ -164,7 +164,7 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
             if (prescription.followUpDate) {
                 doc.moveDown(0.5);
                 doc.fontSize(10).font('Helvetica-Bold').fillColor('#e53935').text(
-                    `Follow-up Date: ${new Date(prescription.followUpDate).toLocaleDateString('en-PK', {
+                    `Data de Retorno: ${new Date(prescription.followUpDate).toLocaleDateString('pt-BR', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -182,8 +182,8 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
                 .font('Helvetica')
                 .fillColor('#999')
                 .text(
-                    'This prescription is digitally generated by HealthCare Management System. ' +
-                    'This document is valid only when signed by the prescribing doctor.',
+                    'Esta prescrição foi gerada digitalmente pelo Sistema de Gestão de Saúde. ' +
+                    'Este documento só é válido quando assinado pelo médico prescritor.',
                     { align: 'center' }
                 );
 
@@ -192,8 +192,8 @@ const generatePrescriptionPDF = (prescription, patient, doctor) => {
                 .fontSize(9)
                 .font('Helvetica-Bold')
                 .fillColor('#333')
-                .text(`Dr. ${doctor.name}`, { align: 'right' });
-            doc.fontSize(8).font('Helvetica').fillColor('#555').text('Authorized Signature', { align: 'right' });
+                .text(`Dr(a). ${doctor.name}`, { align: 'right' });
+            doc.fontSize(8).font('Helvetica').fillColor('#555').text('Assinatura Autorizada', { align: 'right' });
 
             doc.end();
         } catch (err) {

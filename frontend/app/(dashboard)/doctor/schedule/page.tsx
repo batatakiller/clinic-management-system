@@ -30,6 +30,15 @@ const STATUS_COLORS: Record<string, string> = {
   no_show: "bg-gray-100 text-gray-700",
 };
 
+const STATUS_TRANSLATION: Record<string, string> = {
+  pending: "Pendente",
+  confirmed: "Confirmada",
+  "in-progress": "Em Atendimento",
+  completed: "Concluída",
+  cancelled: "Cancelada",
+  no_show: "Não Compareceu",
+};
+
 export default function DoctorSchedulePage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +80,7 @@ export default function DoctorSchedulePage() {
 
       days.push({
         date: dateStr,
-        dayName: date.toLocaleDateString("en-US", { weekday: "short" }),
+        dayName: date.toLocaleDateString("pt-BR", { weekday: "short" }),
         appointments: dayAppointments,
       });
     }
@@ -101,8 +110,8 @@ export default function DoctorSchedulePage() {
     <DashboardLayout requiredRole="doctor">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">My Schedule</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">View your weekly appointment schedule</p>
+          <h1 className="text-xl font-bold text-foreground">Minha Agenda</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Visualize seu cronograma de consultas semanal</p>
         </div>
         <button
           onClick={fetchAppointments}
@@ -110,7 +119,7 @@ export default function DoctorSchedulePage() {
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-med disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh
+          Atualizar
         </button>
       </div>
 
@@ -119,7 +128,7 @@ export default function DoctorSchedulePage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Total Appointments</p>
+              <p className="text-xs text-muted-foreground">Total de Consultas</p>
               <p className="text-2xl font-bold text-foreground">{stats.total}</p>
             </div>
             <Calendar className="w-8 h-8 text-blue-600 opacity-20" />
@@ -128,7 +137,7 @@ export default function DoctorSchedulePage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Today</p>
+              <p className="text-xs text-muted-foreground">Hoje</p>
               <p className="text-2xl font-bold text-blue-600">{stats.today}</p>
             </div>
             <Clock className="w-8 h-8 text-blue-600 opacity-20" />
@@ -137,7 +146,7 @@ export default function DoctorSchedulePage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Completed</p>
+              <p className="text-xs text-muted-foreground">Concluídas</p>
               <p className="text-2xl font-bold text-emerald-600">{stats.completed}</p>
             </div>
             <CheckCircle className="w-8 h-8 text-emerald-600 opacity-20" />
@@ -146,7 +155,7 @@ export default function DoctorSchedulePage() {
         <div className="med-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Cancelled</p>
+              <p className="text-xs text-muted-foreground">Canceladas</p>
               <p className="text-2xl font-bold text-red-600">{stats.cancelled}</p>
             </div>
             <XCircle className="w-8 h-8 text-red-600 opacity-20" />
@@ -158,26 +167,26 @@ export default function DoctorSchedulePage() {
       <div className="med-card p-4 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-foreground">
-            Week of {selectedWeek.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            Semana de {selectedWeek.toLocaleDateString("pt-BR", { month: "long", day: "numeric", year: "numeric" })}
           </h2>
           <div className="flex gap-2">
             <button
               onClick={() => navigateWeek("prev")}
               className="px-3 py-1.5 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-med"
             >
-              ← Previous
+              ← Anterior
             </button>
             <button
               onClick={() => setSelectedWeek(new Date())}
               className="px-3 py-1.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-med"
             >
-              Today
+              Hoje
             </button>
             <button
               onClick={() => navigateWeek("next")}
               className="px-3 py-1.5 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-med"
             >
-              Next →
+              Próxima →
             </button>
           </div>
         </div>
@@ -221,17 +230,17 @@ export default function DoctorSchedulePage() {
       {/* Appointments List */}
       <div className="med-card">
         <div className="px-5 py-4 border-b border-border">
-          <h3 className="font-semibold text-foreground">Upcoming Appointments</h3>
+          <h3 className="font-semibold text-foreground">Próximas Consultas</h3>
         </div>
         {loading ? (
           <div className="p-12 text-center">
             <Clock className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4 animate-pulse" />
-            <p className="text-muted-foreground">Loading schedule...</p>
+            <p className="text-muted-foreground">Carregando agenda...</p>
           </div>
         ) : appointments.length === 0 ? (
           <div className="p-12 text-center">
             <Calendar className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">No appointments scheduled</p>
+            <p className="text-muted-foreground">Nenhuma consulta agendada</p>
           </div>
         ) : (
           <div className="divide-y divide-border">
@@ -251,18 +260,18 @@ export default function DoctorSchedulePage() {
                     {appt.patientId?.name?.split(" ").map((n) => n[0]).join("").slice(0, 2) || "P"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">{appt.patientId?.name || "Unknown Patient"}</p>
+                    <p className="font-medium text-foreground">{appt.patientId?.name || "Paciente Desconhecido"}</p>
                     <p className="text-xs text-muted-foreground">
-                      {appt.reason || "Appointment"} • {appt.timeSlot || "TBD"}
+                      {appt.reason || "Consulta"} • {appt.timeSlot || "A definir"}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <p className="text-sm font-medium text-foreground">
-                        {appt.date ? new Date(appt.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "TBD"}
+                        {appt.date ? new Date(appt.date).toLocaleDateString("pt-BR", { month: "short", day: "numeric" }) : "A definir"}
                       </p>
                       <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[appt.status]}`}>
-                        {appt.status.replace("-", " ")}
+                        {STATUS_TRANSLATION[appt.status] || appt.status}
                       </span>
                     </div>
                   </div>

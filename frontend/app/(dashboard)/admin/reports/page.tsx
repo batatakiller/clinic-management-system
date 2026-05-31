@@ -5,58 +5,58 @@ import { TrendingUp, BarChart3, Calendar, FileText, Download } from "lucide-reac
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const PATIENT_TREND = [
-  { month: "Aug", patients: 156 },
-  { month: "Sep", patients: 189 },
-  { month: "Oct", patients: 245 },
+  { month: "Ago", patients: 156 },
+  { month: "Set", patients: 189 },
+  { month: "Out", patients: 245 },
   { month: "Nov", patients: 312 },
-  { month: "Dec", patients: 278 },
+  { month: "Dez", patients: 278 },
   { month: "Jan", patients: 356 },
-  { month: "Feb", patients: 412 },
+  { month: "Fev", patients: 412 },
 ];
 
 const APPOINTMENT_STATUS = [
-  { name: "Completed", value: 65, color: "#10b981" },
-  { name: "Scheduled", value: 25, color: "#3b82f6" },
-  { name: "Cancelled", value: 7, color: "#ef4444" },
-  { name: "No-show", value: 3, color: "#f59e0b" },
+  { name: "Concluído", value: 65, color: "#10b981" },
+  { name: "Agendado", value: 25, color: "#3b82f6" },
+  { name: "Cancelado", value: 7, color: "#ef4444" },
+  { name: "Ausência", value: 3, color: "#f59e0b" },
 ];
 
 const DEPARTMENT_STATS = [
-  { dept: "Cardiology", visits: 245, revenue: 48500 },
-  { dept: "General Medicine", visits: 412, revenue: 62300 },
-  { dept: "Pediatrics", visits: 198, revenue: 35600 },
-  { dept: "Orthopedics", visits: 167, revenue: 42100 },
-  { dept: "Dermatology", visits: 134, revenue: 28900 },
+  { dept: "Cardiologia", visits: 245, revenue: 48500 },
+  { dept: "Clínica Geral", visits: 412, revenue: 62300 },
+  { dept: "Pediatria", visits: 198, revenue: 35600 },
+  { dept: "Ortopedia", visits: 167, revenue: 42100 },
+  { dept: "Dermatologia", visits: 134, revenue: 28900 },
 ];
 
 export default function ReportsPage() {
   const downloadReport = () => {
-    alert("Report download initiated (demo)");
+    alert("Download do relatório iniciado (demonstração)");
   };
 
   return (
     <DashboardLayout requiredRole="admin">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">Reports & Analytics</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">System-wide statistics and insights</p>
+          <h1 className="text-xl font-bold text-foreground">Relatórios e Análises</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Estatísticas e informações gerais do sistema</p>
         </div>
         <button
           onClick={downloadReport}
           className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-med shadow-md"
         >
           <Download className="w-4 h-4" />
-          Export Report
+          Exportar Relatório
         </button>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          { label: "Total Revenue (MTD)", value: "$248,500", change: "+12.5%", icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Patient Visits (MTD)", value: "1,247", change: "+8.2%", icon: Calendar, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "Avg. Wait Time", value: "14m", change: "-3.1%", icon: BarChart3, color: "text-purple-600", bg: "bg-purple-50" },
-          { label: "Active Records", value: "8,432", change: "+2.4%", icon: FileText, color: "text-amber-600", bg: "bg-amber-50" },
+          { label: "Faturamento Total (Mês Atual)", value: "R$ 248.500", change: "+12.5%", icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Visitas de Pacientes (Mês Atual)", value: "1.247", change: "+8.2%", icon: Calendar, color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "Tempo Médio de Espera", value: "14m", change: "-3.1%", icon: BarChart3, color: "text-purple-600", bg: "bg-purple-50" },
+          { label: "Prontuários Ativos", value: "8.432", change: "+2.4%", icon: FileText, color: "text-amber-600", bg: "bg-amber-50" },
         ].map((stat) => (
           <div key={stat.label} className="med-card p-4">
             <div className="flex items-center justify-between mb-3">
@@ -76,8 +76,8 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         {/* Patient Trend */}
         <div className="med-card p-5">
-          <h3 className="font-semibold text-foreground mb-1">Patient Volume Trend</h3>
-          <p className="text-xs text-muted-foreground mb-4">Last 7 months</p>
+          <h3 className="font-semibold text-foreground mb-1">Tendência de Volume de Pacientes</h3>
+          <p className="text-xs text-muted-foreground mb-4">Últimos 7 meses</p>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={PATIENT_TREND}>
               <defs>
@@ -97,8 +97,8 @@ export default function ReportsPage() {
 
         {/* Appointment Status */}
         <div className="med-card p-5">
-          <h3 className="font-semibold text-foreground mb-1">Appointment Status</h3>
-          <p className="text-xs text-muted-foreground mb-4">This month distribution</p>
+          <h3 className="font-semibold text-foreground mb-1">Status das Consultas</h3>
+          <p className="text-xs text-muted-foreground mb-4">Distribuição deste mês</p>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
@@ -124,16 +124,16 @@ export default function ReportsPage() {
 
       {/* Department Stats */}
       <div className="med-card p-5">
-        <h3 className="font-semibold text-foreground mb-1">Department Performance</h3>
-        <p className="text-xs text-muted-foreground mb-4">This month by department</p>
+        <h3 className="font-semibold text-foreground mb-1">Desempenho dos Departamentos</h3>
+        <p className="text-xs text-muted-foreground mb-4">Mês atual por departamento</p>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/50 border-b border-border">
               <tr>
-                <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 py-3">Department</th>
-                <th className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 py-3">Patient Visits</th>
-                <th className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 py-3">Revenue</th>
-                <th className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 py-3">Avg. per Visit</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 py-3">Departamento</th>
+                <th className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 py-3">Visitas de Pacientes</th>
+                <th className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 py-3">Faturamento</th>
+                <th className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 py-3">Média por Visita</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -141,8 +141,8 @@ export default function ReportsPage() {
                 <tr key={dept.dept} className="hover:bg-muted/40 transition-med">
                   <td className="px-4 py-3 text-sm font-medium text-foreground">{dept.dept}</td>
                   <td className="px-4 py-3 text-sm text-right text-foreground">{dept.visits.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-sm text-right text-emerald-600 font-semibold">${dept.revenue.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-sm text-right text-muted-foreground">${Math.round(dept.revenue / dept.visits).toLocaleString()}</td>
+                  <td className="px-4 py-3 text-sm text-right text-emerald-600 font-semibold">R$ {dept.revenue.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-sm text-right text-muted-foreground">R$ {Math.round(dept.revenue / dept.visits).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>

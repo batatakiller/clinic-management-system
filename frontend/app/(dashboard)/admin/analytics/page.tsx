@@ -8,13 +8,13 @@ import {
 import { TrendingUp, Users, Star, DollarSign } from "lucide-react";
 
 const REVENUE = [
-    { month: "Aug", revenue: 42000, expenses: 28000 },
-    { month: "Sep", revenue: 51000, expenses: 31000 },
-    { month: "Oct", revenue: 47000, expenses: 30000 },
+    { month: "Ago", revenue: 42000, expenses: 28000 },
+    { month: "Set", revenue: 51000, expenses: 31000 },
+    { month: "Out", revenue: 47000, expenses: 30000 },
     { month: "Nov", revenue: 58000, expenses: 34000 },
-    { month: "Dec", revenue: 63000, expenses: 36000 },
+    { month: "Dez", revenue: 63000, expenses: 36000 },
     { month: "Jan", revenue: 55000, expenses: 33000 },
-    { month: "Feb", revenue: 71000, expenses: 38000 },
+    { month: "Fev", revenue: 71000, expenses: 38000 },
     { month: "Mar", revenue: 68000, expenses: 37000 },
 ];
 
@@ -27,17 +27,17 @@ const DOCTORS = [
 ];
 
 const DEPT_PIE = [
-    { name: "Cardiology", value: 28, color: "#2563eb" },
-    { name: "General", value: 22, color: "#0d9488" },
-    { name: "Endocrinology", value: 18, color: "#7c3aed" },
-    { name: "Pulmonology", value: 15, color: "#f59e0b" },
-    { name: "Other", value: 17, color: "#94a3b8" },
+    { name: "Cardiologia", value: 28, color: "#2563eb" },
+    { name: "Clínica Geral", value: 22, color: "#0d9488" },
+    { name: "Endocrinologia", value: 18, color: "#7c3aed" },
+    { name: "Pneumologia", value: 15, color: "#f59e0b" },
+    { name: "Outros", value: 17, color: "#94a3b8" },
 ];
 
 const APPT_STATUS = [
-    { month: "Jan", Completed: 310, Cancelled: 24, "No-Show": 18 },
-    { month: "Feb", Completed: 342, Cancelled: 19, "No-Show": 12 },
-    { month: "Mar", Completed: 289, Cancelled: 28, "No-Show": 21 },
+    { month: "Jan", Concluido: 310, Cancelado: 24, Ausencia: 18 },
+    { month: "Fev", Concluido: 342, Cancelado: 19, Ausencia: 12 },
+    { month: "Mar", Concluido: 289, Cancelado: 28, Ausencia: 21 },
 ];
 
 function StatCard({ icon: Icon, label, value, sub, color, bg }: { icon: React.ElementType; label: string; value: string; sub: string; color: string; bg: string }) {
@@ -59,22 +59,22 @@ export default function AdminAnalyticsPage() {
     return (
         <DashboardLayout requiredRole="admin">
             <div className="mb-6">
-                <h1 className="text-xl font-bold text-foreground">Analytics Overview</h1>
-                <p className="text-xs text-muted-foreground mt-0.5">Performance metrics · March 2026</p>
+                <h1 className="text-xl font-bold text-foreground">Análise de Métricas</h1>
+                <p className="text-xs text-muted-foreground mt-0.5">Métricas de desempenho · Março 2026</p>
             </div>
 
             {/* KPI Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <StatCard icon={DollarSign} label="Monthly Revenue" value="$68,000" sub="↑ 9.7% vs Feb" color="text-blue-600" bg="bg-blue-50" />
-                <StatCard icon={Users} label="Total Patients" value="578" sub="↑ 12% this month" color="text-purple-600" bg="bg-purple-50" />
-                <StatCard icon={Star} label="Avg. Satisfaction" value="4.7 ★" sub="↑ 0.2 pts" color="text-amber-600" bg="bg-amber-50" />
-                <StatCard icon={TrendingUp} label="Appointments Done" value="289" sub="94% completion" color="text-teal-600" bg="bg-teal-50" />
+                <StatCard icon={DollarSign} label="Faturamento Mensal" value="R$ 68.000" sub="↑ 9.7% vs Fev" color="text-blue-600" bg="bg-blue-50" />
+                <StatCard icon={Users} label="Total de Pacientes" value="578" sub="↑ 12% este mês" color="text-purple-600" bg="bg-purple-50" />
+                <StatCard icon={Star} label="Satisfação Média" value="4.7 ★" sub="↑ 0.2 pts" color="text-amber-600" bg="bg-amber-50" />
+                <StatCard icon={TrendingUp} label="Consultas Realizadas" value="289" sub="94% de conclusão" color="text-teal-600" bg="bg-teal-50" />
             </div>
 
             {/* Revenue trend */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
                 <div className="xl:col-span-2 med-card p-5">
-                    <h3 className="font-semibold text-foreground mb-4">Revenue vs Expenses (8 Months)</h3>
+                    <h3 className="font-semibold text-foreground mb-4">Receita vs Despesas (Últimos 8 meses)</h3>
                     <ResponsiveContainer width="100%" height={240}>
                         <AreaChart data={REVENUE} margin={{ top: 5, right: 10, bottom: 0, left: 0 }}>
                             <defs>
@@ -89,18 +89,18 @@ export default function AdminAnalyticsPage() {
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                             <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748b" }} />
-                            <YAxis tick={{ fontSize: 11, fill: "#64748b" }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
+                            <YAxis tick={{ fontSize: 11, fill: "#64748b" }} tickFormatter={v => `R$ ${(v / 1000).toFixed(0)}k`} />
                             <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: 12 }} />
                             <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
-                            <Area type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={2.5} fill="url(#revGrad)" name="Revenue" dot={{ r: 3, fill: "#2563eb" }} />
-                            <Area type="monotone" dataKey="expenses" stroke="#f59e0b" strokeWidth={2} fill="url(#expGrad)" name="Expenses" dot={{ r: 3, fill: "#f59e0b" }} />
+                            <Area type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={2.5} fill="url(#revGrad)" name="Receita" dot={{ r: 3, fill: "#2563eb" }} />
+                            <Area type="monotone" dataKey="expenses" stroke="#f59e0b" strokeWidth={2} fill="url(#expGrad)" name="Despesas" dot={{ r: 3, fill: "#f59e0b" }} />
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>
 
                 {/* Department pie */}
                 <div className="med-card p-5">
-                    <h3 className="font-semibold text-foreground mb-4">Patient by Department</h3>
+                    <h3 className="font-semibold text-foreground mb-4">Pacientes por Departamento</h3>
                     <ResponsiveContainer width="100%" height={180}>
                         <PieChart>
                             <Pie data={DEPT_PIE} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
@@ -126,20 +126,20 @@ export default function AdminAnalyticsPage() {
             {/* Doctor Performance */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-5">
                 <div className="med-card p-5">
-                    <h3 className="font-semibold text-foreground mb-4">Doctor Patient Load</h3>
+                    <h3 className="font-semibold text-foreground mb-4">Volume de Pacientes por Médico</h3>
                     <ResponsiveContainer width="100%" height={220}>
                         <BarChart data={DOCTORS} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                             <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#64748b" }} />
                             <YAxis tick={{ fontSize: 11, fill: "#64748b" }} />
                             <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: 12 }} />
-                            <Bar dataKey="patients" fill="#2563eb" radius={[6, 6, 0, 0]} name="Patients" />
+                            <Bar dataKey="patients" fill="#2563eb" radius={[6, 6, 0, 0]} name="Pacientes" />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
 
                 <div className="med-card p-5">
-                    <h3 className="font-semibold text-foreground mb-4">Appointment Outcomes</h3>
+                    <h3 className="font-semibold text-foreground mb-4">Resultados das Consultas</h3>
                     <ResponsiveContainer width="100%" height={220}>
                         <BarChart data={APPT_STATUS} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
@@ -147,9 +147,9 @@ export default function AdminAnalyticsPage() {
                             <YAxis dataKey="month" type="category" tick={{ fontSize: 12, fill: "#64748b" }} />
                             <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: 12 }} />
                             <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
-                            <Bar dataKey="Completed" fill="#10b981" radius={[0, 4, 4, 0]} stackId="a" />
-                            <Bar dataKey="Cancelled" fill="#f59e0b" radius={[0, 0, 0, 0]} stackId="a" />
-                            <Bar dataKey="No-Show" fill="#ef4444" radius={[0, 4, 4, 0]} stackId="a" />
+                            <Bar dataKey="Concluido" fill="#10b981" radius={[0, 4, 4, 0]} name="Concluído" stackId="a" />
+                            <Bar dataKey="Cancelado" fill="#f59e0b" radius={[0, 0, 0, 0]} name="Cancelado" stackId="a" />
+                            <Bar dataKey="Ausencia" fill="#ef4444" radius={[0, 4, 4, 0]} name="Ausência" stackId="a" />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
@@ -158,13 +158,13 @@ export default function AdminAnalyticsPage() {
             {/* Doctor performance table */}
             <div className="med-card overflow-hidden">
                 <div className="px-5 py-4 border-b border-border">
-                    <h3 className="font-semibold text-foreground">Doctor Performance Leaderboard</h3>
+                    <h3 className="font-semibold text-foreground">Classificação de Desempenho dos Médicos</h3>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-border bg-muted/30">
-                                {["Rank", "Doctor", "Patients", "Revenue", "Satisfaction"].map(h => (
+                                {["Classificação", "Médico", "Pacientes", "Faturamento", "Satisfação"].map(h => (
                                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{h}</th>
                                 ))}
                             </tr>
@@ -177,7 +177,7 @@ export default function AdminAnalyticsPage() {
                                     </td>
                                     <td className="px-5 py-3 font-medium text-foreground">{d.name}</td>
                                     <td className="px-5 py-3 text-muted-foreground">{d.patients}</td>
-                                    <td className="px-5 py-3 text-foreground font-medium">${d.revenue.toLocaleString()}</td>
+                                    <td className="px-5 py-3 text-foreground font-medium">R$ {d.revenue.toLocaleString()}</td>
                                     <td className="px-5 py-3">
                                         <div className="flex items-center gap-1.5">
                                             <div className="h-1.5 w-24 rounded-full bg-muted overflow-hidden">

@@ -8,9 +8,9 @@ import { useAuth } from "../../contexts/AuthContext";
 import Link from "next/link";
 
 const STATUS_COLOR: Record<string, string> = {
-  Upcoming: "bg-blue-50 text-blue-700 border-blue-100",
-  Completed: "bg-slate-100 text-slate-700 border-slate-200",
-  Cancelled: "bg-red-50 text-red-700 border-red-100",
+  "Agendada": "bg-blue-50 text-blue-700 border-blue-100",
+  "Concluída": "bg-slate-100 text-slate-700 border-slate-200",
+  "Cancelada": "bg-red-50 text-red-700 border-red-100",
 };
 
 
@@ -47,17 +47,17 @@ export default function PatientDashboard() {
         }) || [];
         const now = new Date();
         const upcoming = myAppts.filter((a) => a.status === "scheduled" && a.date && new Date(a.date) >= now).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
-        const nextApptLabel = upcoming.length > 0 && upcoming[0].date ? new Date(upcoming[0].date).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "None";
+        const nextApptLabel = upcoming.length > 0 && upcoming[0].date ? new Date(upcoming[0].date).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "Nenhuma";
         setStats({ nextAppt: nextApptLabel, activeRx: (rxRes.data?.length || 0).toString(), records: myAppts.length.toString() });
         setAppointments(myAppts.slice(0, 5).map((a) => ({
-          doctor: (typeof a.doctor === "object" ? a.doctor?.name : "Doctor") || "Doctor",
-          type: a.type || "Appointment",
-          date: a.date ? new Date(a.date).toLocaleDateString() : "TBD",
-          time: a.time || "TBD",
-          status: { scheduled: "Upcoming", completed: "Completed", cancelled: "Cancelled" }[a.status?.toLowerCase() || "scheduled"] || "Upcoming",
+          doctor: (typeof a.doctor === "object" ? a.doctor?.name : "Médico") || "Médico",
+          type: a.type || "Consulta",
+          date: a.date ? new Date(a.date).toLocaleDateString() : "A definir",
+          time: a.time || "A definir",
+          status: { scheduled: "Agendada", completed: "Concluída", cancelled: "Cancelada" }[a.status?.toLowerCase() || "scheduled"] || "Agendada",
         })));
         setPrescriptions((rxRes.data || []).slice(0, 4).map((r) => ({
-          name: r.medications?.[0]?.name || "General Prescription",
+          name: r.medications?.[0]?.name || "Prescrição Geral",
           issued: r.issuedAt ? new Date(r.issuedAt).toLocaleDateString() : new Date(r.createdAt || Date.now()).toLocaleDateString(),
           refills: r.medications?.[0]?.refills || 0,
         })));
@@ -73,17 +73,17 @@ export default function PatientDashboard() {
         {/* ── Page Header ─────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Patient Portal</h1>
+            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Portal do Paciente</h1>
             <p className="text-sm text-slate-500 mt-1">
-              Welcome back, {user?.name}. Manage your health records and upcoming visits.
+              Bem-vindo(a) de volta, {user?.name}. Gerencie seus registros de saúde e próximas consultas.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/chatbot" className="h-9 px-4 flex items-center justify-center gap-2 border border-slate-200 bg-white rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-              Talk to AI Assistant
+              Falar com Assistente de IA
             </Link>
             <Link href="/patient/appointments" className="h-9 px-4 flex items-center justify-center bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">
-              Book Visit
+              Agendar Consulta
             </Link>
           </div>
         </div>
@@ -91,10 +91,10 @@ export default function PatientDashboard() {
         {/* ── Stats ─────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {[
-            { label: "Next Appointment", value: stats.nextAppt, icon: Calendar },
-            { label: "Active Prescriptions", value: stats.activeRx, icon: Pill },
-            { label: "Health Documents", value: stats.records, icon: FileText },
-            { label: "Vitals Logged", value: "0", icon: Heart },
+            { label: "Próxima Consulta", value: stats.nextAppt, icon: Calendar },
+            { label: "Prescrições Ativas", value: stats.activeRx, icon: Pill },
+            { label: "Documentos de Saúde", value: stats.records, icon: FileText },
+            { label: "Sinais Vitais Registrados", value: "0", icon: Heart },
           ].map((s) => {
             const Icon = s.icon;
             return (
@@ -118,11 +118,11 @@ export default function PatientDashboard() {
           <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
             <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
               <div>
-                <h3 className="text-base font-semibold text-slate-900">My Appointments</h3>
-                <p className="text-sm text-slate-500 mt-0.5">Recent and upcoming visits</p>
+                <h3 className="text-base font-semibold text-slate-900">Minhas Consultas</h3>
+                <p className="text-sm text-slate-500 mt-0.5">Consultas recentes e futuras</p>
               </div>
               <Link href="/patient/appointments" className="text-sm text-blue-600 font-medium hover:text-blue-700">
-                View All
+                Ver Todas
               </Link>
             </div>
             <div className="divide-y divide-slate-100">
@@ -135,14 +135,14 @@ export default function PatientDashboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-900">Dr. {a.doctor}</p>
-                    <p className="text-sm text-slate-500 mt-0.5">{a.type} &bull; {a.date} at {a.time}</p>
+                    <p className="text-sm text-slate-500 mt-0.5">{a.type} &bull; {a.date} às {a.time}</p>
                   </div>
-                  <span className={`text-xs font-medium px-2.5 py-1 rounded-md border ${STATUS_COLOR[a.status] || STATUS_COLOR.Upcoming}`}>
+                  <span className={`text-xs font-medium px-2.5 py-1 rounded-md border ${STATUS_COLOR[a.status] || STATUS_COLOR["Agendada"]}`}>
                     {a.status}
                   </span>
                 </div>
               )) : (
-                <div className="px-6 py-10 text-center text-sm text-slate-500">No recent appointments.</div>
+                <div className="px-6 py-10 text-center text-sm text-slate-500">Nenhuma consulta recente.</div>
               )}
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function PatientDashboard() {
           {/* Prescriptions & Vitals */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-semibold text-slate-900">Current Medications</h3>
+              <h3 className="text-base font-semibold text-slate-900">Medicamentos Atuais</h3>
               <Pill className="w-4 h-4 text-slate-400" />
             </div>
             <div className="space-y-3">
@@ -161,21 +161,21 @@ export default function PatientDashboard() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-slate-900 truncate">{rx.name}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">Issued: {rx.issued} &bull; Refills: {rx.refills}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Emitido: {rx.issued} &bull; Reabastecimentos: {rx.refills}</p>
                   </div>
                 </div>
               )) : (
-                <div className="py-4 text-center text-sm text-slate-500">No active prescriptions.</div>
+                <div className="py-4 text-center text-sm text-slate-500">Nenhuma prescrição ativa.</div>
               )}
             </div>
 
             {/* Health Vitals Indicator */}
             <div className="mt-8 pt-6 border-t border-slate-100">
-              <h4 className="text-sm font-semibold text-slate-900 mb-4">Latest Vitals</h4>
+              <h4 className="text-sm font-semibold text-slate-900 mb-4">Últimos Sinais Vitais</h4>
               <div className="space-y-4">
                 <div className="py-4 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
                   <Heart className="w-5 h-5 text-slate-300 mx-auto mb-2" />
-                  <p className="text-sm text-slate-500 font-medium">No vitals logged recently.</p>
+                  <p className="text-sm text-slate-500 font-medium">Nenhum sinal vital registrado recentemente.</p>
                 </div>
               </div>
             </div>

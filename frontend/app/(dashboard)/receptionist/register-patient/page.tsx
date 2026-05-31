@@ -28,8 +28,8 @@ const INIT: FormData = {
 };
 
 const BLOOD_GROUPS = ["A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−"];
-const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
-const RELATIONS = ["Spouse", "Parent", "Sibling", "Child", "Friend", "Other"];
+const GENDERS = ["Masculino", "Feminino", "Não-binário", "Prefiro não dizer"];
+const RELATIONS = ["Cônjuge", "Pai/Mãe", "Irmão/Irmã", "Filho(a)", "Amigo(a)", "Outro"];
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
     return (
@@ -67,19 +67,19 @@ export default function RegisterPatientPage() {
                     <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
                         <Check className="w-10 h-10 text-emerald-600" />
                     </div>
-                    <h2 className="text-2xl font-bold text-foreground mb-2">Patient Registered!</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Paciente Cadastrado(a)!</h2>
                     <p className="text-muted-foreground mb-6">
-                        {form.firstName} {form.lastName} has been successfully added to the system.
+                        {form.firstName} {form.lastName} foi adicionado(a) com sucesso ao sistema.
                     </p>
                     <div className="flex gap-3 justify-center">
                         <button
                             onClick={() => { setForm(INIT); setSubmitted(false); }}
                             className="px-5 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-med"
                         >
-                            Register Another
+                            Cadastrar Outro
                         </button>
                         <Link href="/receptionist" className="px-5 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted/60 transition-med">
-                            Back to Dashboard
+                            Voltar ao Painel
                         </Link>
                     </div>
                 </div>
@@ -98,8 +98,8 @@ export default function RegisterPatientPage() {
                     <UserPlus className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                    <h1 className="text-xl font-bold text-foreground">Register New Patient</h1>
-                    <p className="text-xs text-muted-foreground">Fill in all required fields to create a patient record</p>
+                    <h1 className="text-xl font-bold text-foreground">Cadastrar Novo Paciente</h1>
+                    <p className="text-xs text-muted-foreground">Preencha todos os campos obrigatórios para criar o registro do paciente</p>
                 </div>
             </div>
 
@@ -108,32 +108,32 @@ export default function RegisterPatientPage() {
                 <div className="med-card p-5">
                     <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                         <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">1</span>
-                        Personal Information
+                        Informações Pessoais
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Field label="First Name" required>
-                            <input required className={inputCls} placeholder="e.g. Maria" value={form.firstName}
+                        <Field label="Nome" required>
+                            <input required className={inputCls} placeholder="Ex: Maria" value={form.firstName}
                                 onChange={e => set("firstName", e.target.value)} />
                         </Field>
-                        <Field label="Last Name" required>
-                            <input required className={inputCls} placeholder="e.g. Santos" value={form.lastName}
+                        <Field label="Sobrenome" required>
+                            <input required className={inputCls} placeholder="Ex: Santos" value={form.lastName}
                                 onChange={e => set("lastName", e.target.value)} />
                         </Field>
-                        <Field label="Date of Birth" required>
+                        <Field label="Data de Nascimento" required>
                             <input required type="date" className={inputCls} value={form.dob}
                                 onChange={e => set("dob", e.target.value)} />
                         </Field>
-                        <Field label="Gender" required>
+                        <Field label="Gênero" required>
                             <select required className={selectCls} value={form.gender}
                                 onChange={e => set("gender", e.target.value)}>
-                                <option value="">Select gender…</option>
+                                <option value="">Selecione o gênero…</option>
                                 {GENDERS.map(g => <option key={g}>{g}</option>)}
                             </select>
                         </Field>
-                        <Field label="Blood Group">
+                        <Field label="Tipo Sanguíneo">
                             <select className={selectCls} value={form.blood}
                                 onChange={e => set("blood", e.target.value)}>
-                                <option value="">Unknown / Not tested</option>
+                                <option value="">Desconhecido / Não testado</option>
                                 {BLOOD_GROUPS.map(b => <option key={b}>{b}</option>)}
                             </select>
                         </Field>
@@ -144,19 +144,19 @@ export default function RegisterPatientPage() {
                 <div className="med-card p-5">
                     <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                         <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">2</span>
-                        Contact Details
+                        Detalhes de Contato
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Field label="Phone Number" required>
-                            <input required type="tel" className={inputCls} placeholder="+1 (555) 000-0000" value={form.phone}
+                        <Field label="Número de Telefone" required>
+                            <input required type="tel" className={inputCls} placeholder="+55 (11) 99999-9999" value={form.phone}
                                 onChange={e => set("phone", e.target.value)} />
                         </Field>
-                        <Field label="Email Address">
-                            <input type="email" className={inputCls} placeholder="patient@email.com" value={form.email}
+                        <Field label="Endereço de E-mail">
+                            <input type="email" className={inputCls} placeholder="paciente@email.com" value={form.email}
                                 onChange={e => set("email", e.target.value)} />
                         </Field>
-                        <Field label="Home Address">
-                            <textarea rows={2} className={inputCls} placeholder="Street, City, State, ZIP" value={form.address}
+                        <Field label="Endereço Residencial">
+                            <textarea rows={2} className={inputCls} placeholder="Rua, Cidade, Estado, CEP" value={form.address}
                                 onChange={e => set("address", e.target.value)} />
                         </Field>
                     </div>
@@ -166,21 +166,21 @@ export default function RegisterPatientPage() {
                 <div className="med-card p-5">
                     <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                         <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">3</span>
-                        Emergency Contact
+                        Contato de Emergência
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <Field label="Contact Name">
-                            <input className={inputCls} placeholder="Full name" value={form.ecName}
+                        <Field label="Nome do Contato">
+                            <input className={inputCls} placeholder="Nome completo" value={form.ecName}
                                 onChange={e => set("ecName", e.target.value)} />
                         </Field>
-                        <Field label="Phone">
-                            <input type="tel" className={inputCls} placeholder="+1 (555) 000-0000" value={form.ecPhone}
+                        <Field label="Telefone">
+                            <input type="tel" className={inputCls} placeholder="+55 (11) 99999-9999" value={form.ecPhone}
                                 onChange={e => set("ecPhone", e.target.value)} />
                         </Field>
-                        <Field label="Relation">
+                        <Field label="Parentesco/Relação">
                             <select className={selectCls} value={form.ecRelation}
                                 onChange={e => set("ecRelation", e.target.value)}>
-                                <option value="">Select…</option>
+                                <option value="">Selecione…</option>
                                 {RELATIONS.map(r => <option key={r}>{r}</option>)}
                             </select>
                         </Field>
@@ -191,11 +191,11 @@ export default function RegisterPatientPage() {
                 <div className="med-card p-5">
                     <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                         <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">4</span>
-                        Medical Notes
+                        Observações Médicas
                     </h3>
-                    <Field label="Existing Conditions / Allergies / Notes">
+                    <Field label="Condições Existentes / Alergias / Observações">
                         <textarea rows={4} className={inputCls}
-                            placeholder="e.g. Allergic to penicillin. Diabetic Type 2. Previous surgery: appendectomy 2018."
+                            placeholder="Ex: Alérgico a penicilina. Diabético Tipo 2. Cirurgia anterior: apendicectomia em 2018."
                             value={form.notes} onChange={e => set("notes", e.target.value)} />
                     </Field>
                 </div>
@@ -203,17 +203,17 @@ export default function RegisterPatientPage() {
                 {/* Actions */}
                 <div className="flex items-center gap-3">
                     <button type="submit" disabled={loading}
-                        className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 disabled:opacity-60 transition-med">
+                        className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 disabled:opacity-60 transition-med">
                         {loading ? (
                             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : (
                             <UserPlus className="w-4 h-4" />
                         )}
-                        {loading ? "Registering…" : "Register Patient"}
+                        {loading ? "Cadastrando…" : "Cadastrar Paciente"}
                     </button>
                     <button type="button" onClick={() => setForm(INIT)}
                         className="px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted/60 transition-med">
-                        Clear Form
+                        Limpar Formulário
                     </button>
                 </div>
             </form>

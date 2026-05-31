@@ -52,64 +52,64 @@ interface Suggestion {
 const suggestions: Suggestion[] = [
   {
     id: "1",
-    text: "What are common cold symptoms?",
+    text: "Quais são os sintomas do resfriado comum?",
     icon: <Stethoscope className="w-4 h-4" />,
-    category: "Symptoms",
+    category: "Sintomas",
   },
   {
     id: "2",
-    text: "How can I improve my sleep quality?",
+    text: "Como posso melhorar a qualidade do meu sono?",
     icon: <Activity className="w-4 h-4" />,
-    category: "Wellness",
+    category: "Bem-estar",
   },
   {
     id: "3",
-    text: "What's a balanced healthy diet?",
+    text: "O que é uma dieta saudável e equilibrada?",
     icon: <Lightbulb className="w-4 h-4" />,
-    category: "Nutrition",
+    category: "Nutrição",
   },
   {
     id: "4",
-    text: "How much water should I drink daily?",
+    text: "Quanta água devo beber diariamente?",
     icon: <Shield className="w-4 h-4" />,
-    category: "Health",
+    category: "Saúde",
   },
   {
     id: "5",
-    text: "Explain common medication side effects",
+    text: "Explique os efeitos colaterais comuns de medicamentos",
     icon: <Pill className="w-4 h-4" />,
-    category: "Medication",
+    category: "Medicamentos",
   },
   {
     id: "6",
-    text: "When should I see a doctor for headaches?",
+    text: "Quando devo consultar um médico para dores de cabeça?",
     icon: <Stethoscope className="w-4 h-4" />,
-    category: "Symptoms",
+    category: "Sintomas",
   },
 ];
 
 const quickActions = [
   {
     icon: <Stethoscope className="w-4 h-4" />,
-    label: "Check Symptoms",
+    label: "Verificar Sintomas",
     color: "from-blue-500 to-cyan-500",
     hoverColor: "hover:from-blue-600 hover:to-cyan-600",
   },
   {
     icon: <Pill className="w-4 h-4" />,
-    label: "Medication Info",
+    label: "Info sobre Medicamento",
     color: "from-purple-500 to-pink-500",
     hoverColor: "hover:from-purple-600 hover:to-pink-600",
   },
   {
     icon: <Activity className="w-4 h-4" />,
-    label: "Health Tips",
+    label: "Dicas de Saúde",
     color: "from-green-500 to-emerald-500",
     hoverColor: "hover:from-green-600 hover:to-emerald-600",
   },
   {
     icon: <Shield className="w-4 h-4" />,
-    label: "Prevention",
+    label: "Prevenção",
     color: "from-orange-500 to-amber-500",
     hoverColor: "hover:from-orange-600 hover:to-amber-600",
   },
@@ -152,7 +152,7 @@ export default function ChatbotPage() {
     }
   }, [user, router]);
 
-  // Save history to localStorage whenever messages change
+  // Save history to localStorage
   useEffect(() => {
     if (user && messages.length > 0) {
       localStorage.setItem(`chatbot_messages_${user._id}`, JSON.stringify(messages));
@@ -189,13 +189,13 @@ export default function ChatbotPage() {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: "ai",
-        content: data.data?.aiResponse || "I'm sorry, I couldn't process that request.",
+        content: data.data?.aiResponse || "Desculpe, não consegui processar essa requisição.",
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (err: any) {
-      const errorMessage = err?.message || "Something went wrong. Please try again.";
+      const errorMessage = err?.message || "Algo deu errado. Por favor, tente novamente.";
       setError(errorMessage);
       const errorAIMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -264,7 +264,7 @@ export default function ChatbotPage() {
             </div>
             <div className="absolute -inset-2 bg-gradient-to-br from-blue-400 to-purple-400 rounded-2xl blur-lg opacity-50 animate-ping" />
           </div>
-          <p className="text-gray-600 font-medium mt-4">Loading your AI assistant...</p>
+          <p className="text-gray-600 font-medium mt-4">Carregando seu assistente de IA...</p>
         </motion.div>
       </div>
     );
@@ -286,7 +286,7 @@ export default function ChatbotPage() {
                 whileTap={{ scale: 0.9 }}
                 onClick={() => router.back()}
                 className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-600 border border-gray-100 shadow-sm bg-white"
-                title="Go Back"
+                title="Voltar"
               >
                 <ArrowLeft className="w-5 h-5" />
               </motion.button>
@@ -309,12 +309,12 @@ export default function ChatbotPage() {
                 </motion.div>
                 <div>
                   <h1 className="text-xl font-bold text-gray-900 flex items-center space-x-2">
-                    <span>Healthcare AI Assistant</span>
+                    <span>Assistente de IA do Healthcare</span>
                     <Sparkles className="w-5 h-5 text-yellow-500" />
                   </h1>
                   <p className="text-sm text-gray-500 flex items-center space-x-1">
                     <Heart className="w-3 h-3 text-red-500" />
-                    <span>Always here to help with your health questions</span>
+                    <span>Sempre aqui para ajudar com suas dúvidas de saúde</span>
                   </p>
                 </div>
               </div>
@@ -328,7 +328,7 @@ export default function ChatbotPage() {
                   className="flex items-center space-x-1.5 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors text-sm font-medium border border-red-200"
                 >
                   <Trash2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Clear Chat</span>
+                  <span className="hidden sm:inline">Limpar Conversa</span>
                 </motion.button>
               )}
             </div>
@@ -365,10 +365,10 @@ export default function ChatbotPage() {
                     />
                   </motion.div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-3 flex items-center justify-center gap-3">
-                    Welcome!
+                    Bem-vindo!
                   </h2>
                   <p className="text-gray-600 mb-8 text-lg">
-                    I'm your personal healthcare AI assistant. Ask me anything about health, symptoms, medications, or wellness.
+                    Sou seu assistente pessoal de saúde com Inteligência Artificial. Pergunte-me qualquer coisa sobre saúde, sintomas, medicamentos ou bem-estar.
                   </p>
 
                   {/* Quick Action Pills */}
@@ -381,7 +381,7 @@ export default function ChatbotPage() {
                         transition={{ delay: index * 0.1 }}
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => sendMessage(`Tell me about ${action.label.toLowerCase()}`)}
+                        onClick={() => sendMessage(`Fale-me sobre ${action.label.toLowerCase()}`)}
                         className={`flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r ${action.color} ${action.hoverColor} text-white rounded-full text-sm font-medium shadow-md hover:shadow-lg transition-all`}
                       >
                         {action.icon}
@@ -512,7 +512,7 @@ export default function ChatbotPage() {
                             className={`text-xs ${msg.type === "user" ? "text-indigo-100" : "text-gray-400"
                               }`}
                           >
-                            {msg.timestamp.toLocaleTimeString([], {
+                            {msg.timestamp.toLocaleTimeString("pt-BR", {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}
@@ -523,7 +523,7 @@ export default function ChatbotPage() {
                                 onClick={() => giveFeedback(msg.id, "up")}
                                 className={`p-1 rounded hover:bg-green-100 transition-colors ${msg.feedback === "up" ? "text-green-600 bg-green-50" : "text-gray-400"
                                   }`}
-                                title="Helpful"
+                                title="Útil"
                               >
                                 <ThumbsUp className="w-3.5 h-3.5" />
                               </button>
@@ -531,14 +531,14 @@ export default function ChatbotPage() {
                                 onClick={() => giveFeedback(msg.id, "down")}
                                 className={`p-1 rounded hover:bg-red-100 transition-colors ${msg.feedback === "down" ? "text-red-600 bg-red-50" : "text-gray-400"
                                   }`}
-                                title="Not helpful"
+                                title="Não útil"
                               >
                                 <ThumbsDown className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => copyMessage(msg.content, msg.id)}
                                 className="p-1 rounded hover:bg-blue-100 text-gray-400 hover:text-blue-600 transition-colors"
-                                title="Copy message"
+                                title="Copiar mensagem"
                               >
                                 {copiedId === msg.id ? (
                                   <Check className="w-3.5 h-3.5 text-green-600" />
@@ -605,7 +605,7 @@ export default function ChatbotPage() {
                   <div className="flex items-center space-x-2 bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg shadow-sm">
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <div>
-                      <p className="font-semibold text-sm">Error</p>
+                      <p className="font-semibold text-sm">Erro</p>
                       <p className="text-xs">{error}</p>
                     </div>
                     <button
@@ -639,7 +639,7 @@ export default function ChatbotPage() {
                 value={input}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your health question here..."
+                placeholder="Digite sua dúvida de saúde aqui..."
                 disabled={loading}
                 className="w-full px-4 py-3.5 pr-12 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 disabled:cursor-not-allowed transition-all text-gray-800 placeholder-gray-400"
               />
@@ -670,14 +670,14 @@ export default function ChatbotPage() {
           <div className="flex items-center justify-between mt-3">
             <p className="text-xs text-gray-500 flex items-center space-x-1">
               <Sparkles className="w-3 h-3 text-blue-500" />
-              <span>AI-powered health assistant • Responses are informational only</span>
+              <span>Assistente de saúde alimentado por IA • As respostas são apenas informativas</span>
             </p>
             <button
-              onClick={() => sendMessage("Can you explain that in simpler terms?")}
+              onClick={() => sendMessage("Pode explicar isso em termos mais simples?")}
               className="flex items-center space-x-1 text-xs text-blue-600 hover:underline font-medium"
             >
               <RotateCcw className="w-3 h-3" />
-              <span>Simplify</span>
+              <span>Simplificar</span>
             </button>
           </div>
         </div>

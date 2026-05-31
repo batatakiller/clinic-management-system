@@ -19,7 +19,7 @@ const register = async (req, res, next) => {
         // Check if email already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return errorResponse(res, 'An account with this email already exists.', 409);
+            return errorResponse(res, 'Uma conta com este e-mail já existe.', 409);
         }
 
         const user = await User.create({
@@ -51,7 +51,7 @@ const register = async (req, res, next) => {
                     phone: user.phone,
                 },
             },
-            'Account created successfully',
+            'Conta criada com sucesso',
             201
         );
     } catch (error) {
@@ -67,25 +67,26 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
+        console.log('Login request received with:', { email, password });
 
         if (!email || !password) {
-            return errorResponse(res, 'Please provide both email and password.', 400);
+            return errorResponse(res, 'Por favor, forneça o e-mail e a senha.', 400);
         }
 
         // Find user — explicitly select password (it's excluded by default)
         const user = await User.findOne({ email }).select('+password');
 
         if (!user) {
-            return errorResponse(res, 'Invalid email or password.', 401);
+            return errorResponse(res, 'E-mail ou senha inválidos.', 401);
         }
 
         if (!user.isActive) {
-            return errorResponse(res, 'Your account has been deactivated. Please contact admin.', 401);
+            return errorResponse(res, 'Sua conta foi desativada. Por favor, contate o administrador.', 401);
         }
 
         const isMatch = await user.matchPassword(password);
         if (!isMatch) {
-            return errorResponse(res, 'Invalid email or password.', 401);
+            return errorResponse(res, 'E-mail ou senha inválidos.', 401);
         }
 
         // Update last login
@@ -109,7 +110,7 @@ const login = async (req, res, next) => {
                     lastLogin: user.lastLogin,
                 },
             },
-            `Welcome back, ${user.name}!`
+            `Bem-vindo(a) de volta, ${user.name}!`
         );
     } catch (error) {
         next(error);
@@ -124,7 +125,7 @@ const login = async (req, res, next) => {
 const getMe = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
-        return successResponse(res, user, 'User profile retrieved successfully');
+        return successResponse(res, user, 'Perfil do usuário recuperado com sucesso');
     } catch (error) {
         next(error);
     }
@@ -140,24 +141,24 @@ const changePassword = async (req, res, next) => {
         const { currentPassword, newPassword } = req.body;
 
         if (!currentPassword || !newPassword) {
-            return errorResponse(res, 'Please provide current and new password.', 400);
+            return errorResponse(res, 'Por favor, forneça a senha atual e a nova senha.', 400);
         }
 
         if (newPassword.length < 6) {
-            return errorResponse(res, 'New password must be at least 6 characters.', 400);
+            return errorResponse(res, 'A nova senha deve ter pelo menos 6 caracteres.', 400);
         }
 
         const user = await User.findById(req.user._id).select('+password');
         const isMatch = await user.matchPassword(currentPassword);
 
         if (!isMatch) {
-            return errorResponse(res, 'Current password is incorrect.', 401);
+            return errorResponse(res, 'A senha atual está incorreta.', 401);
         }
 
         user.password = newPassword;
         await user.save();
 
-        return successResponse(res, null, 'Password updated successfully');
+        return successResponse(res, null, 'Senha atualizada com sucesso');
     } catch (error) {
         next(error);
     }
@@ -174,7 +175,7 @@ const updateProfile = async (req, res, next) => {
         const user = await User.findById(req.user._id);
 
         if (!user) {
-            return errorResponse(res, 'User not found.', 404);
+            return errorResponse(res, 'Usuário não encontrado.', 404);
         }
 
         if (name) user.name = name;
@@ -217,7 +218,7 @@ const updateProfile = async (req, res, next) => {
                 phone: user.phone,
                 profileImage: user.profileImage,
             },
-            'Profile updated successfully'
+            'Perfil atualizado com sucesso'
         );
     } catch (error) {
         next(error);

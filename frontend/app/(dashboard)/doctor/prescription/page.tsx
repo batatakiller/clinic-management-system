@@ -22,8 +22,8 @@ interface Patient {
     name: string;
 }
 
-const FREQ_OPTIONS = ["Once daily", "Twice daily", "Three times daily", "Four times daily", "Every 8 hours", "Every 12 hours", "As needed (PRN)", "At bedtime"];
-const DUR_OPTIONS = ["3 days", "5 days", "7 days", "10 days", "14 days", "1 month", "3 months", "Ongoing"];
+const FREQ_OPTIONS = ["Uma vez ao dia", "Duas vezes ao dia", "Três vezes ao dia", "Quatro vezes ao dia", "A cada 8 horas", "A cada 12 horas", "Se necessário (SN)", "Ao deitar"];
+const DUR_OPTIONS = ["3 dias", "5 dias", "7 dias", "10 dias", "14 dias", "1 mês", "3 meses", "Contínuo"];
 
 const inputCls = "w-full px-2.5 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med placeholder:text-muted-foreground/50";
 
@@ -32,7 +32,7 @@ function PrescriptionContent() {
     const { user } = useAuth();
     const patientNameParam = params.get("patient") || "";
     const patientAgeParam = params.get("age") || "";
-    const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const today = new Date().toLocaleDateString("pt-BR", { year: "numeric", month: "long", day: "numeric" });
 
     const { success, error } = useToast();
     const printRef = useRef<HTMLDivElement>(null);
@@ -66,9 +66,9 @@ function PrescriptionContent() {
 
     const validate = () => {
         const empty = meds.filter(m => !m.name.trim() || !m.dosage.trim());
-        if (empty.length > 0) { error("Incomplete prescription", "Please fill Medicine Name and Dosage for all rows."); return false; }
-        if (!selectedPatient) { error("Patient required", "Please select a patient."); return false; }
-        if (!diagnosis.trim()) { error("Diagnosis required", "Please enter a diagnosis."); return false; }
+        if (empty.length > 0) { error("Prescrição incompleta", "Por favor, preencha o Nome do Medicamento e a Dosagem para todas as linhas."); return false; }
+        if (!selectedPatient) { error("Paciente obrigatório", "Por favor, selecione um paciente."); return false; }
+        if (!diagnosis.trim()) { error("Diagnóstico obrigatório", "Por favor, insira um diagnóstico."); return false; }
         return true;
     };
 
@@ -77,7 +77,7 @@ function PrescriptionContent() {
         setLoading(true);
         try {
             if (!selectedPatient) {
-                error("Patient required", "Please select a patient.");
+                error("Paciente obrigatório", "Por favor, selecione um paciente.");
                 return;
             }
             const prescriptionData = {
@@ -99,7 +99,7 @@ function PrescriptionContent() {
                 body: JSON.stringify(prescriptionData),
             });
 
-            success("Prescription Saved!", "Prescription has been saved to the database.");
+            success("Prescrição Salva!", "A prescrição foi salva no banco de dados.");
             
             // Reset form
             setMeds([{ id: 1, name: "", dosage: "", frequency: FREQ_OPTIONS[0], duration: DUR_OPTIONS[0], instructions: "" }]);
@@ -108,7 +108,7 @@ function PrescriptionContent() {
             setFollowUpDate("");
             setSelectedPatient(null);
         } catch (err: any) {
-            error("Save failed", err.message || "Could not save prescription to database.");
+            error("Falha ao salvar", err.message || "Não foi possível salvar a prescrição no banco de dados.");
         } finally {
             setLoading(false);
         }
@@ -128,40 +128,40 @@ function PrescriptionContent() {
             const W = pdf.internal.pageSize.getWidth();
             const H = (canvas.height / canvas.width) * W;
             pdf.addImage(img, "PNG", 0, 0, W, H);
-            const patientName = selectedPatient?.name || patientNameParam || "Patient";
+            const patientName = selectedPatient?.name || patientNameParam || "Paciente";
             pdf.save(`Rx_${patientName.replace(/ /g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`);
-            success("PDF Downloaded!", `Prescription for ${patientName} saved.`);
+            success("PDF Baixado!", `Prescrição para ${patientName} salva.`);
         } catch {
-            error("Download failed", "Could not generate PDF. Please try again.");
+            error("Falha no download", "Não foi possível gerar o PDF. Por favor, tente novamente.");
         } finally {
             setLoading(false);
         }
     };
 
-    const patientName = selectedPatient?.name || patientNameParam || "Patient";
+    const patientName = selectedPatient?.name || patientNameParam || "Paciente";
     const patientAge = patientAgeParam || "—";
 
     return (
         <DashboardLayout requiredRole="doctor">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-xl font-bold text-foreground">Write Prescription</h1>
-                    <p className="text-xs text-muted-foreground mt-0.5">Create and save a professional prescription</p>
+                    <h1 className="text-xl font-bold text-foreground">Escrever Prescrição</h1>
+                    <p className="text-xs text-muted-foreground mt-0.5">Crie e salve uma prescrição profissional</p>
                 </div>
                 <div className="flex gap-2">
                     <button onClick={saveToDatabase} disabled={loading}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-60 transition-med">
                         <Save className="w-4 h-4" />
-                        {loading ? "Saving…" : "Save to DB"}
+                        {loading ? "Salvando…" : "Salvar no BD"}
                     </button>
                     <button onClick={() => window.print()}
                         className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-med">
-                        <Printer className="w-4 h-4" /> Print
+                        <Printer className="w-4 h-4" /> Imprimir
                     </button>
                     <button onClick={downloadPDF} disabled={loading}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 disabled:opacity-60 transition-med">
                         {loading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Download className="w-4 h-4" />}
-                        {loading ? "Generating…" : "Download PDF"}
+                        {loading ? "Gerando…" : "Baixar PDF"}
                     </button>
                 </div>
             </div>
@@ -171,7 +171,7 @@ function PrescriptionContent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-foreground mb-1.5">
-                            Select Patient *
+                            Selecionar Paciente *
                         </label>
                         <select
                             value={selectedPatient?._id || ""}
@@ -181,7 +181,7 @@ function PrescriptionContent() {
                             }}
                             className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
                         >
-                            <option value="">Choose a patient...</option>
+                            <option value="">Escolha um paciente...</option>
                             {patients.map((p) => (
                                 <option key={p._id} value={p._id}>{p.name}</option>
                             ))}
@@ -189,14 +189,14 @@ function PrescriptionContent() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-foreground mb-1.5">
-                            Diagnosis *
+                            Diagnóstico *
                         </label>
                         <input
                             type="text"
                             value={diagnosis}
                             onChange={(e) => setDiagnosis(e.target.value)}
                             className={inputCls}
-                            placeholder="e.g., Type 2 Diabetes Mellitus"
+                            placeholder="Ex: Diabetes Mellitus Tipo 2"
                         />
                     </div>
                 </div>
@@ -214,7 +214,7 @@ function PrescriptionContent() {
                                 </div>
                                 <span className="font-bold text-lg">HealthCareMS</span>
                             </div>
-                            <p className="text-blue-200 text-xs">Medical Prescription</p>
+                            <p className="text-blue-200 text-xs">Prescrição Médica</p>
                         </div>
                         <div className="text-right text-sm">
                             <p className="font-semibold">Dr. James Carter</p>
@@ -228,16 +228,16 @@ function PrescriptionContent() {
                     {/* Patient info */}
                     <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
                         <div>
-                            <p className="text-xs text-muted-foreground">Patient Name</p>
+                            <p className="text-xs text-muted-foreground">Nome do Paciente</p>
                             <p className="font-semibold text-foreground">{patientName}</p>
                         </div>
                         <div>
-                            <p className="text-xs text-muted-foreground">Age</p>
-                            <p className="font-semibold text-foreground">{patientAge} years</p>
+                            <p className="text-xs text-muted-foreground">Idade</p>
+                            <p className="font-semibold text-foreground">{patientAge} anos</p>
                         </div>
                         <div className="col-span-2">
-                            <p className="text-xs text-muted-foreground mb-1">Diagnosis / Condition</p>
-                            <p className="font-medium text-foreground">{diagnosis || "Not specified"}</p>
+                            <p className="text-xs text-muted-foreground mb-1">Diagnóstico / Condição</p>
+                            <p className="font-medium text-foreground">{diagnosis || "Não especificado"}</p>
                         </div>
                     </div>
 
@@ -245,11 +245,11 @@ function PrescriptionContent() {
                     <div className="mb-6">
                         <div className="flex items-center justify-between mb-3">
                             <h3 className="font-semibold text-foreground flex items-center gap-2">
-                                <ClipboardList className="w-4 h-4 text-primary" /> Medicines
+                                <ClipboardList className="w-4 h-4 text-primary" /> Medicamentos
                             </h3>
                             <button onClick={addMed}
                                 className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-med">
-                                <Plus className="w-3.5 h-3.5" /> Add Medicine
+                                <Plus className="w-3.5 h-3.5" /> Adicionar Medicamento
                             </button>
                         </div>
 
@@ -261,32 +261,32 @@ function PrescriptionContent() {
                                     </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pl-7">
                                         <div className="sm:col-span-1">
-                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Medicine *</label>
-                                            <input className={inputCls} placeholder="Drug name" value={med.name}
+                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Medicamento *</label>
+                                            <input className={inputCls} placeholder="Nome do medicamento" value={med.name}
                                                 onChange={e => updateMed(med.id, "name", e.target.value)} />
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Dosage *</label>
-                                            <input className={inputCls} placeholder="e.g. 500mg" value={med.dosage}
+                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Dosagem *</label>
+                                            <input className={inputCls} placeholder="Ex: 500mg" value={med.dosage}
                                                 onChange={e => updateMed(med.id, "dosage", e.target.value)} />
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Frequency</label>
+                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Frequência</label>
                                             <select className={inputCls} value={med.frequency}
                                                 onChange={e => updateMed(med.id, "frequency", e.target.value)}>
                                                 {FREQ_OPTIONS.map(f => <option key={f}>{f}</option>)}
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Duration</label>
+                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Duração</label>
                                             <select className={inputCls} value={med.duration}
                                                 onChange={e => updateMed(med.id, "duration", e.target.value)}>
                                                 {DUR_OPTIONS.map(d => <option key={d}>{d}</option>)}
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Instructions</label>
-                                            <input className={inputCls} placeholder="e.g. After meals" value={med.instructions}
+                                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase mb-1">Instruções</label>
+                                            <input className={inputCls} placeholder="Ex: Após as refeições" value={med.instructions}
                                                 onChange={e => updateMed(med.id, "instructions", e.target.value)} />
                                         </div>
                                     </div>
@@ -302,14 +302,14 @@ function PrescriptionContent() {
 
                     {/* Doctor Notes */}
                     <div className="mb-4">
-                        <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Doctor&apos;s Notes &amp; Instructions</label>
-                        <textarea rows={3} className={inputCls} placeholder="Additional instructions, lifestyle advice, follow-up date…"
+                        <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Observações e Instruções do(a) Médico(a)</label>
+                        <textarea rows={3} className={inputCls} placeholder="Instruções adicionais, conselhos de estilo de vida, data de retorno…"
                             value={notes} onChange={e => setNotes(e.target.value)} />
                     </div>
 
                     {/* Follow-up Date */}
                     <div className="mb-4">
-                        <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Follow-up Date</label>
+                        <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Data de Retorno</label>
                         <input
                             type="date"
                             value={followUpDate}
@@ -323,7 +323,7 @@ function PrescriptionContent() {
                         <div className="text-right">
                             <div className="w-36 border-b border-foreground mb-1 pb-4" />
                             <p className="text-sm font-medium text-foreground">Dr. James Carter</p>
-                            <p className="text-xs text-muted-foreground">Signature &amp; Stamp</p>
+                            <p className="text-xs text-muted-foreground">Assinatura e Carimbo</p>
                         </div>
                     </div>
                 </div>
@@ -334,7 +334,7 @@ function PrescriptionContent() {
 
 export default function PrescriptionPage() {
     return (
-        <Suspense fallback={<div className="p-8 text-muted-foreground">Loading…</div>}>
+        <Suspense fallback={<div className="p-8 text-muted-foreground">Carregando…</div>}>
             <PrescriptionContent />
         </Suspense>
     );

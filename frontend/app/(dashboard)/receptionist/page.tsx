@@ -14,6 +14,13 @@ const STATUS_BADGE: Record<string, string> = {
   cancelled: "bg-red-50 text-red-700 border-red-100",
 };
 
+const STATUS_TRANSLATION: Record<string, string> = {
+  scheduled: "Agendada",
+  "in-progress": "Em Atendimento",
+  completed: "Concluída",
+  cancelled: "Cancelada",
+};
+
 interface AppointmentData {
   _id?: string; patient?: { name: string; _id: string } | string;
   doctor?: { name: string; _id: string } | string;
@@ -42,10 +49,10 @@ export default function ReceptionistDashboard() {
         const newRegCount = (patientsRes.data || []).filter((p) => p.createdAt?.startsWith(today)).length;
         setStats({ newReg: newRegCount.toString(), todayBookings: todayAppts.length.toString(), inQueue: inQueueCount.toString() });
         setBookings(todayAppts.slice(0, 10).map((a) => ({
-          patient: (typeof a.patient === "object" ? a.patient?.name : "Patient") || "Unknown Patient",
-          doctor: (typeof a.doctor === "object" ? a.doctor?.name : "Doctor") || "Assigned Doctor",
-          time: a.time || "TBD",
-          type: a.type || "General Checkup",
+          patient: (typeof a.patient === "object" ? a.patient?.name : "Paciente") || "Paciente Desconhecido",
+          doctor: (typeof a.doctor === "object" ? a.doctor?.name : "Médico") || "Médico Designado",
+          time: a.time || "A definir",
+          type: a.type || "Check-up Geral",
           status: a.status || "scheduled",
         })));
       } catch (err) { console.error(err); }
@@ -60,17 +67,17 @@ export default function ReceptionistDashboard() {
         {/* ── Page Header ─────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Front Desk</h1>
+            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Recepção</h1>
             <p className="text-sm text-slate-500 mt-1">
-              Welcome, {user?.name?.split(" ")[0] || "Receptionist"}. Manage today's clinic flow.
+              Bem-vindo(a), {user?.name?.split(" ")[0] || "Recepcionista"}. Gerencie o fluxo da clínica hoje.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/receptionist/book-appointment" className="h-9 px-4 flex items-center justify-center gap-2 border border-slate-200 bg-white rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-              <Calendar className="w-4 h-4" /> Book Slot
+              <Calendar className="w-4 h-4" /> Agendar Consulta
             </Link>
             <Link href="/receptionist/register-patient" className="h-9 px-4 flex items-center justify-center gap-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">
-              <UserPlus className="w-4 h-4" /> Register Patient
+              <UserPlus className="w-4 h-4" /> Cadastrar Paciente
             </Link>
           </div>
         </div>
@@ -78,10 +85,10 @@ export default function ReceptionistDashboard() {
         {/* ── Stats ─────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {[
-            { label: "New Registrations today", value: stats.newReg, icon: UserPlus },
-            { label: "Bookings Today", value: stats.todayBookings, icon: Calendar },
-            { label: "Waiting in Queue", value: stats.inQueue, icon: ListTodo },
-            { label: "Avg Check-in Time", value: "N/A", icon: Clock },
+            { label: "Novos Cadastros Hoje", value: stats.newReg, icon: UserPlus },
+            { label: "Agendamentos Hoje", value: stats.todayBookings, icon: Calendar },
+            { label: "Aguardando na Fila", value: stats.inQueue, icon: ListTodo },
+            { label: "Tempo Médio de Entrada", value: "N/A", icon: Clock },
           ].map((s) => {
             const Icon = s.icon;
             return (
@@ -105,11 +112,11 @@ export default function ReceptionistDashboard() {
           <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
             <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
               <div>
-                <h3 className="text-base font-semibold text-slate-900">Today's Schedule</h3>
-                <p className="text-sm text-slate-500 mt-0.5">{stats.todayBookings} confirmed visits</p>
+                <h3 className="text-base font-semibold text-slate-900">Agenda de Hoje</h3>
+                <p className="text-sm text-slate-500 mt-0.5">{stats.todayBookings} consultas confirmadas</p>
               </div>
               <Link href="/receptionist/appointments" className="text-sm text-blue-600 font-medium hover:text-blue-700">
-                View Schedule
+                Ver Agenda
               </Link>
             </div>
             <div className="divide-y divide-slate-100 flex-1">
@@ -126,26 +133,26 @@ export default function ReceptionistDashboard() {
                   </div>
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
                     <span className="text-sm font-medium text-slate-900">{b.time}</span>
-                    <span className={`text-[11px] font-medium px-2 py-0.5 rounded border capitalize ${STATUS_BADGE[b.status] || STATUS_BADGE.scheduled}`}>
-                      {b.status}
+                    <span className={`text-[11px] font-medium px-2 py-0.5 rounded border ${STATUS_BADGE[b.status] || STATUS_BADGE.scheduled}`}>
+                      {STATUS_TRANSLATION[b.status] || b.status}
                     </span>
                   </div>
                 </div>
               )) : (
-                <div className="py-16 text-center text-sm text-slate-500">No bookings for today.</div>
+                <div className="py-16 text-center text-sm text-slate-500">Nenhum agendamento para hoje.</div>
               )}
             </div>
           </div>
 
           {/* Quick Actions */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
-            <h3 className="text-base font-semibold text-slate-900 mb-5">Desk Tasks</h3>
+            <h3 className="text-base font-semibold text-slate-900 mb-5">Tarefas da Recepção</h3>
 
             <div className="space-y-3">
               {[
-                { label: "Register New Patient", icon: UserPlus, href: "/receptionist/register-patient" },
-                { label: "Book Appointment", icon: Calendar, href: "/receptionist/book-appointment" },
-                { label: "Manage Today's Queue", icon: ListTodo, href: "/receptionist/queue" }
+                { label: "Cadastrar Novo Paciente", icon: UserPlus, href: "/receptionist/register-patient" },
+                { label: "Agendar Consulta", icon: Calendar, href: "/receptionist/book-appointment" },
+                { label: "Gerenciar Fila de Hoje", icon: ListTodo, href: "/receptionist/queue" }
               ].map((action) => {
                 const Icon = action.icon;
                 return (
@@ -171,8 +178,8 @@ export default function ReceptionistDashboard() {
             <div className="mt-8 pt-6 border-t border-slate-100">
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-4 text-center">
                 <CheckCircle2 className="w-6 h-6 text-slate-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-slate-700">All systems active</p>
-                <p className="text-xs text-slate-500 mt-1">Ready for check-ins</p>
+                <p className="text-sm font-medium text-slate-700">Todos os sistemas ativos</p>
+                <p className="text-xs text-slate-500 mt-1">Pronto para novos atendimentos</p>
               </div>
             </div>
           </div>
