@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import DashboardLayout from "../../DashboardLayout";
-import { UserPlus, Check, ChevronLeft } from "lucide-react";
+import { UserPlus, Check, ChevronLeft, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
 interface FormData {
     firstName: string;
@@ -31,6 +32,13 @@ const BLOOD_GROUPS = ["A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−"];
 const GENDERS = ["Masculino", "Feminino", "Não-binário", "Prefiro não dizer"];
 const RELATIONS = ["Cônjuge", "Pai/Mãe", "Irmão/Irmã", "Filho(a)", "Amigo(a)", "Outro"];
 
+const GENDER_MAP: Record<string, string> = {
+    "Masculino": "male",
+    "Feminino": "female",
+    "Não-binário": "other",
+    "Prefiro não dizer": "prefer_not_to_say"
+};
+
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
     return (
         <div>
@@ -49,15 +57,54 @@ export default function RegisterPatientPage() {
     const [form, setForm] = useState<FormData>(INIT);
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [tempPassword, setTempPassword] = useState("");
+    const [registeredEmail, setRegisteredEmail] = useState("");
 
     const set = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }));
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        await new Promise(r => setTimeout(r, 900));
-        setLoading(false);
-        setSubmitted(true);
+        setError(null);
+
+        const generatedPassword = Math.random().toString(36).slice(-8);
+        const email = form.email.trim() || `paciente.${Date.now()}@clinica.com.br`;
+        const mappedGender = GENDER_MAP[form.gender] || "other";
+        const cleanedBlood = form.blood ? form.blood.replace("−", "-") : undefined;
+
+        setTempPassword(generatedPassword);
+        setRegisteredEmail(email);
+
+        try {
+            await apiFetch("/api/patients", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: `${form.firstName} ${form.lastName}`.trim(),
+                    email,
+                    password: generatedPassword,
+                    phone: form.phone,
+                    dateOfBirth: form.dob,
+                    gender: mappedGender,
+                    bloodGroup: cleanedBlood,
+                    address: {
+                        street: form.address,
+                    },
+                    emergencyContact: {
+                        name: form.ecName,
+                        phone: form.ecPhone,
+                        relationship: form.ecRelation,
+                    },
+                    notes: form.notes,
+                }),
+            });
+
+            setSubmitted(true);
+        } catch (err: any) {
+            setError(err.message || "Falha ao cadastrar paciente. Tente novamente.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (submitted) {
@@ -71,9 +118,25 @@ export default function RegisterPatientPage() {
                     <p className="text-muted-foreground mb-6">
                         {form.firstName} {form.lastName} foi adicionado(a) com sucesso ao sistema.
                     </p>
+
+                    <div className="bg-muted/50 border border-border rounded-xl p-4 mb-8 text-left space-y-2">
+                        <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Credenciais de Acesso</h4>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">E-mail:</span>
+                            <span className="font-semibold text-foreground">{registeredEmail}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Senha Temporária:</span>
+                            <span className="font-mono font-bold text-primary select-all">{tempPassword}</span>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-2">
+                            * Forneça essas credenciais ao paciente para que ele possa acessar o portal dele.
+                        </p>
+                    </div>
+
                     <div className="flex gap-3 justify-center">
                         <button
-                            onClick={() => { setForm(INIT); setSubmitted(false); }}
+                            onClick={() => { setForm(INIT); setSubmitted(false); setError(null); }}
                             className="px-5 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-med"
                         >
                             Cadastrar Outro
@@ -199,6 +262,13 @@ export default function RegisterPatientPage() {
                             value={form.notes} onChange={e => set("notes", e.target.value)} />
                     </Field>
                 </div>
+
+                {error && (
+                    <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <div>{error}</div>
+                    </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex items-center gap-3">
