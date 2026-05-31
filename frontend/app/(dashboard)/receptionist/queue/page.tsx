@@ -61,7 +61,8 @@ export default function ReceptionistQueuePage() {
     return () => clearInterval(interval);
   }, [fetchAppointments]);
 
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   const todayAppointments = appointments.filter((a) => {
     const apptDate = a.date ? new Date(a.date).toISOString().split("T")[0] : "";
     return apptDate === today;

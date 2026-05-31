@@ -144,7 +144,8 @@ export default function AdminDashboard() {
 
         const totalPatients = patientsRes.data?.length || 0;
         const activeDoctors = doctorsRes.data?.filter((u) => u.role === "doctor")?.length || 0;
-        const today = new Date().toISOString().split("T")[0];
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
         const todayAppts = appointmentsRes.data?.filter((a) => a.date?.startsWith(today))?.length || 0;
 
         setStats([

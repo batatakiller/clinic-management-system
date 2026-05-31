@@ -44,7 +44,8 @@ export default function DoctorQueuePage() {
     try {
       setRefreshing(true);
       const res = await apiFetch("/api/appointments");
-      const today = new Date().toISOString().split("T")[0];
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
       const todayAppts = (res.data || []).filter((a: Appointment) => {
         const apptDate = a.date ? new Date(a.date).toISOString().split("T")[0] : "";
         return apptDate === today;

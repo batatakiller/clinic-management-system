@@ -43,7 +43,8 @@ export default function ReceptionistDashboard() {
           apiFetch("/api/appointments").catch(() => ({ data: [] })) as Promise<ApiResponse<AppointmentData>>,
           apiFetch("/api/patients").catch(() => ({ data: [] })) as Promise<ApiResponse<PatientData>>,
         ]);
-        const today = new Date().toISOString().split("T")[0];
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
         const todayAppts = (apptsRes.data || []).filter((a) => a.date?.startsWith(today));
         const inQueueCount = todayAppts.filter((a) => a.status === "scheduled" || a.status === "in-progress").length;
         const newRegCount = (patientsRes.data || []).filter((p) => p.createdAt?.startsWith(today)).length;

@@ -54,7 +54,8 @@ export default function DoctorDashboard() {
           const dId = typeof a.doctor === "object" ? a.doctor?._id : a.doctor;
           return dId === user._id;
         }) || [];
-        const today = new Date().toISOString().split("T")[0];
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
         const todayApps = myAppts.filter((a) => a.date?.startsWith(today));
         setStats({ todayPatients: todayApps.length.toString(), appointments: myAppts.length.toString(), prescriptions: (rxRes.data?.length || 0).toString() });
         setQueue(todayApps.slice(0, 5).map((a) => ({
