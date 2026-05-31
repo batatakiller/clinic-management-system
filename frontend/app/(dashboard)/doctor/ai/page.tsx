@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import {
   Bot,
@@ -10,6 +10,7 @@ import {
   RotateCcw,
   Stethoscope,
 } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 interface Condition {
   name: string;
@@ -17,6 +18,12 @@ interface Condition {
   probability: string;
   description: string;
 }
+
+interface Patient {
+  _id: string;
+  name: string;
+}
+
 
 interface AIResult {
   summary: string;
@@ -51,11 +58,28 @@ export default function SymptomCheckerPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AIResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [patientName, setPatientName] = useState("");
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [selectedPatientId, setSelectedPatientId] = useState("");
   const [charCount, setCharCount] = useState(0);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const res = await apiFetch("/api/patients");
+        setPatients(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch patients:", err);
+      }
+    };
+    fetchPatients();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedPatientId) {
+      setError("Por favor, selecione um paciente.");
+      return;
+    }
     if (!symptoms.trim() || symptoms.trim().length < 5) {
       setError(
         "Por favor, descreva os sintomas com mais detalhes (mínimo de 5 caracteres).",
@@ -95,6 +119,7 @@ export default function SymptomCheckerPage() {
             .map((s) => s.trim())
             .filter((s) => s),
           history: "",
+          patientId: selectedPatientId,
         }),
       });
       const data = await res.json();
@@ -132,7 +157,7 @@ export default function SymptomCheckerPage() {
     setSymptoms("");
     setResult(null);
     setError(null);
-    setPatientName("");
+    setSelectedPatientId("");
     setCharCount(0);
   };
 
@@ -170,14 +195,21 @@ export default function SymptomCheckerPage() {
           <form onSubmit={handleSubmit} className="med-card p-5 space-y-4">
             <div>
               <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
-                Nome do Paciente (Opcional)
+                Selecionar Paciente *
               </label>
-              <input
+              <select
+                required
                 className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-med"
-                placeholder="Ex: Maria Santos"
-                value={patientName}
-                onChange={(e) => setPatientName(e.target.value)}
-              />
+                value={selectedPatientId}
+                onChange={(e) => setSelectedPatientId(e.target.value)}
+              >
+                <option value="">Escolha um paciente...</option>
+                {patients.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
