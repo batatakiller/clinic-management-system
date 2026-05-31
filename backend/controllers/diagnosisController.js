@@ -3,6 +3,7 @@ const DiagnosisLog = require("../models/DiagnosisLog");
 const User = require("../models/User");
 const Prescription = require("../models/Prescription");
 const { successResponse, errorResponse } = require("../utils/apiResponse");
+const axios = require("axios");
 
 // ─────────────────────────────────────────────────────────────────────
 // AI DIAGNOSIS FALLBACK — returned when AI is unavailable or fails
@@ -75,31 +76,62 @@ const getAIDiagnosis = async (req, res, next) => {
 
     const startTime = Date.now();
     let aiData = null;
-    let source = "gemini";
+    let source = "openai";
     let errorMessage = null;
 
-    // ── Try Gemini API ────────────────────────────────────────────────
+    // ── Try OpenRouter or Gemini API ──────────────────────────────────
     try {
-      if (!process.env.GEMINI_API_KEY) {
-        throw new Error("GEMINI_API_KEY is not configured");
-      }
-
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
       const prompt = buildDiagnosisPrompt(symptoms, history);
+      let rawText = "";
 
-      // Set a timeout for the AI call
-      const aiCallPromise = model.generateContent(prompt);
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(
-          () => reject(new Error("AI request timed out after 15 seconds")),
-          15000,
-        ),
-      );
+      if (process.env.OPENROUTER_API_KEY) {
+        source = "openai";
+        const response = await axios.post(
+          "https://openrouter.ai/api/v1/chat/completions",
+          {
+            model: process.env.OPENROUTER_MODEL || "openai/gpt-4o",
+            messages: [
+              {
+                role: "system",
+                content: "You are an expert medical AI assistant helping a licensed doctor with preliminary diagnosis.",
+              },
+              {
+                role: "user",
+                content: prompt,
+              },
+            ],
+            temperature: 0.2,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+              "Content-Type": "application/json",
+              "HTTP-Referer": process.env.CLIENT_URL || "http://localhost:3000",
+              "X-Title": "Healthcare Diagnosis Suggestion",
+            },
+            timeout: 15000,
+          }
+        );
+        rawText = response.data.choices?.[0]?.message?.content?.trim() || "";
+      } else if (process.env.GEMINI_API_KEY) {
+        source = "gemini";
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      const result = await Promise.race([aiCallPromise, timeoutPromise]);
-      const rawText = result.response.text().trim();
+        // Set a timeout for the AI call
+        const aiCallPromise = model.generateContent(prompt);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("AI request timed out after 15 seconds")),
+            15000,
+          ),
+        );
+
+        const result = await Promise.race([aiCallPromise, timeoutPromise]);
+        rawText = result.response.text().trim();
+      } else {
+        throw new Error("Neither OPENROUTER_API_KEY nor GEMINI_API_KEY is configured");
+      }
 
       // More robust JSON extraction - finds the first { and last }
       const jsonStart = rawText.indexOf("{");
